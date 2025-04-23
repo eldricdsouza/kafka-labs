@@ -1,0 +1,109 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-2.4-using-compacted-topics">Lab 2.4: Using Compacted Topics</h1>
+<h3 id="overview">Overview</h3>
+<p>Use Kafka Command line utils</p>
+<h3 id="depends-on">Depends On</h3>
+<h3 id="run-time">Run time</h3>
+<p>10 mins</p>
+<h2 id="step-1-create-a-compacted-topic">Step-1: Create a Compacted Topic</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$  <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> --bootstrap-server localhost:9092 \</a>
+<a class="sourceLine" id="cb1-2" title="2"> --create --topic compact1 \</a>
+<a class="sourceLine" id="cb1-3" title="3"> --replication-factor 1 --partitions 2 \</a>
+<a class="sourceLine" id="cb1-4" title="4"> --config <span class="st">&quot;cleanup.policy=compact&quot;</span> \</a>
+<a class="sourceLine" id="cb1-5" title="5"> --config <span class="st">&quot;delete.retention.ms=1000&quot;</span> \</a>
+<a class="sourceLine" id="cb1-6" title="6"> --config <span class="st">&quot;segment.ms=1000&quot;</span> \</a>
+<a class="sourceLine" id="cb1-7" title="7"> --config <span class="st">&quot;max.compaction.lag.ms=1000&quot;</span></a></code></pre></div>
+<p>Configuration explained:</p>
+<ul>
+<li><strong>cleanup.policy</strong> : The default cleanup policy for segments beyond the retention window. Valid policies are: “delete” and “compact”. <a href="https://kafka.apache.org/documentation/#topicconfigs_cleanup.policy">More details here</a></li>
+<li><strong>delete.retention.ms</strong>: The amount of time to retain delete tombstone markers for log compacted topics. Default 86400000 (1 day). <a href="https://kafka.apache.org/documentation/#topicconfigs_delete.retention.ms">More details here</a></li>
+<li><strong>segment.ms</strong>: This configuration controls the period of time after which Kafka will force the log to roll. Default 604800000 (7 days). <a href="https://kafka.apache.org/documentation/#topicconfigs_segment.ms">More details here</a></li>
+<li><strong>min.cleanable.dirty.ratio</strong>: This configuration controls how frequently the log compactor will attempt to clean the log. Default is 0.5 (50%). <a href="https://kafka.apache.org/documentation/#topicconfigs_min.cleanable.dirty.ratio">More details here</a></li>
+<li><strong>min.compaction.lag.ms</strong>: the minimal time that has to pass before the message can be compacted. That is one of the reasons why we cannot expect to see only the most recent version of the message in the topic. <a href="https://kafka.apache.org/documentation/#topicconfigs_min.compaction.lag.ms">More details here</a></li>
+<li><strong>max.compaction.lag.ms</strong>: the maximum delay between the time a message is written and the time the message becomes eligible for compaction. This configuration parameter overwrites min.cleanable.dirty.ratio and forces a log segment to become compactable even if the “dirty ratio” is lower than the threshold. Default value is 9223372036854775808 (292,471,208.677 years!). <a href="https://kafka.apache.org/documentation/#topicconfigs_max.compaction.lag.ms">More details here</a></li>
+</ul>
+<p>For more detailed explanation see <a href="https://kafka.apache.org/documentation/">Kafka documentation</a></p>
+<h2 id="step-2-inspect-created-topic">Step-2: Inspect Created Topic</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> --bootstrap-server localhost:9092  \</a>
+<a class="sourceLine" id="cb2-2" title="2">        --describe --topic compact1</a></code></pre></div>
+<p>You will see output as follows</p>
+<pre class="console"><code>Topic: compact1 PartitionCount: 2       ReplicationFactor: 1    Configs: cleanup.policy=compact,segment.bytes=1073741824,max.compaction.lag.ms=1000,delete.retention.ms=100,segment.ms=100
+
+        Topic: compact1 Partition: 0    Leader: 0       Replicas: 0     Isr: 0
+        Topic: compact1 Partition: 1    Leader: 0       Replicas: 0     Isr: 0</code></pre>
+<h2 id="step-3-send-some-data">Step-3: Send Some Data</h2>
+<p>Start console producer and send some data</p>
+<p>Using <code>Kafkacat</code></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$   <span class="ex">kafkacat</span> -P -b localhost:9092 -t compact1 -K :</a></code></pre></div>
+<p>or using <code>console-producer</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-console-producer.sh</span> --bootstrap-server localhost:9092 \</a>
+<a class="sourceLine" id="cb5-2" title="2">        --property parse.key=true --property key.separator=:  \</a>
+<a class="sourceLine" id="cb5-3" title="3">        --topic compact1</a></code></pre></div>
+<p>Type some sample data in this format. We are using <code>:</code> as key-value seperator.</p>
+<pre class="console"><code>k1:v1a
+k2:v2a
+k1:v1b
+k1:v1c
+k2:v2b
+k3:v3a
+k2:v2c</code></pre>
+<p>Note: To end the input data stream you can type <code>Ctrl + d</code> on this terminal.</p>
+<h2 id="step-4-read-data">Step-4: Read Data</h2>
+<p>Open another terminal.</p>
+<p>Run a consumer using <code>kafkacat</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t compact1 -f <span class="st">&#39;Partition %t[%p], offset: %o, key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<p>or using <code>console consumer</code> and read from beginning.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-console-consumer.sh</span> --bootstrap-server localhost:9092 --property  print.key=true --property key.separator=: --from-beginning  --topic compact1</a></code></pre></div>
+<p>You might see output like this:</p>
+<pre class="console"><code>k1:v1c
+k2:v2b
+k3:v3a
+k2:v2c</code></pre>
+<h3 id="note">Note:</h3>
+<p>If you don’t see the compacted results, paste the data again in the producer and restart the consumer.</p>
+<h2 id="step-5-discuss-the-results">Step-5: Discuss the Results</h2>
+<p>As we can see, not all keys are compacted? Why is that?</p>
+<p>Kafka broker divides the partition log into segments. Segments are files stored in the file system (inside data directory and in the directory of the partition), which their name ends with <code>.log</code></p>
+<p>The last segment in the partition is called the <strong>active segment</strong>. Only the active segment of a log can receive the newly produced messages.</p>
+<p>Kafka will not compact keys in <strong>active segment</strong></p>
+<p><img src="../assets/images/log-compaction-3.png" /></p>
+<p>You can see partition logs like this</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$   <span class="ex">tree</span>  /tmp/kafka-logs/compact1-*</a></code></pre></div>
+<pre class="console"><code>/tmp/kafka-logs/compact1-0
+├── 00000000000000000000.index
+├── 00000000000000000000.log
+├── 00000000000000000000.timeindex
+└── leader-epoch-checkpoint
+/tmp/kafka-logs/compact1-1
+├── 00000000000000000000.index
+├── 00000000000000000000.log
+├── 00000000000000000000.timeindex
+├── 00000000000000000006.snapshot
+├── 00000000000000000007.index
+├── 00000000000000000007.log
+├── 00000000000000000007.snapshot
+├── 00000000000000000007.timeindex
+└── leader-epoch-checkpoint</code></pre>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="co">#   /tmp/kafka-logs/TOPIC_NAME-PARTITION</span></a>
+<a class="sourceLine" id="cb12-2" title="2"></a>
+<a class="sourceLine" id="cb12-3" title="3">$   <span class="fu">ls</span> -ltr /tmp/kafka-logs/compact1-1/</a></code></pre></div>
+<pre class="console"><code>-rw-r--r-- 1 ubuntu ubuntu        8 Jan 18 22:55 leader-epoch-checkpoint
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 18 23:07 00000000000000000006.snapshot
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 18 23:07 00000000000000000007.snapshot
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 18 23:59 00000000000000000008.snapshot
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 19 00:07 00000000000000000009.snapshot
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 19 00:07 00000000000000000010.snapshot
+-rw-r--r-- 1 ubuntu ubuntu       12 Jan 19 00:18 00000000000000000000.timeindex
+-rw-r--r-- 1 ubuntu ubuntu      147 Jan 19 00:18 00000000000000000000.log
+-rw-r--r-- 1 ubuntu ubuntu        0 Jan 19 00:18 00000000000000000000.index
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 19 00:18 00000000000000000011.snapshot
+-rw-r--r-- 1 ubuntu ubuntu 10485756 Jan 19 00:18 00000000000000000012.timeindex
+-rw-r--r-- 1 ubuntu ubuntu       10 Jan 19 00:18 00000000000000000012.snapshot
+-rw-r--r-- 1 ubuntu ubuntu       74 Jan 19 00:18 00000000000000000012.log
+-rw-r--r-- 1 ubuntu ubuntu 10485760 Jan 19 00:18 00000000000000000012.index</code></pre>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://towardsdatascience.com/log-compacted-topics-in-apache-kafka-b1aa1e4665a7">Log compaction in Kafka</a></li>
+<li><a href="https://www.mikulskibartosz.name/what-is-kafka-log-compaction-how-does-it-work/">What is kafka log compaction how does it work</a></li>
+</ul>

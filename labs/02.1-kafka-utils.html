@@ -1,0 +1,73 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-2.1-kafka-command-line-utilities">Lab 2.1 : Kafka Command Line Utilities</h1>
+<h2 id="overview">Overview</h2>
+<p>Use Kafka Command line utils</p>
+<h2 id="depends-on">Depends On</h2>
+<p>None</p>
+<h2 id="run-time">Run time</h2>
+<p>10 mins</p>
+<h2 id="quick-note---bootstrap-server-or---zookeeper">Quick Note: <code>--bootstrap-server</code> or <code>--zookeeper</code></h2>
+<p>The older version of Kafka commands used <code>-zookeeper</code> flag.</p>
+<p>For example:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> \</a>
+<a class="sourceLine" id="cb1-2" title="2">        --zookeeper localhost:2181 --list</a></code></pre></div>
+<p>In newer clients, <code>--zookeeper</code> flag is being replaced by <code>--bootstrap-server</code> option</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> \</a>
+<a class="sourceLine" id="cb2-2" title="2">        --bootstrap-server localhost:9092 --list</a></code></pre></div>
+<p>So going forward please use <code>--bootstrap-server</code> option</p>
+<h2 id="step-1-open-two-terminals-to-your-kafka-node">Step 1 : Open two terminals to your Kafka node</h2>
+<p><img src="../assets/images/2a.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<ul>
+<li><p>Option 1 : Use Jupyter Labs and open two terminals ( File –&gt; New –&gt; Terminal)<br />
+You can drag the terminal tab to order them</p></li>
+<li><p>Option 2 : Open multiple SSH terminals using Putty or equivalent</p></li>
+</ul>
+<h2 id="step-2-create-topics">Step 2 : Create Topics</h2>
+<p>Inspect current topics</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> \</a>
+<a class="sourceLine" id="cb3-2" title="2">        --bootstrap-server localhost:9092 --list</a></code></pre></div>
+<p>Let’s create a <code>test</code> topic</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span>  --bootstrap-server localhost:9092   \</a>
+<a class="sourceLine" id="cb4-2" title="2">       --create --topic test --replication-factor 1  --partitions 2</a></code></pre></div>
+<p>Verify:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> \</a>
+<a class="sourceLine" id="cb5-2" title="2">        --bootstrap-server localhost:9092  --list</a>
+<a class="sourceLine" id="cb5-3" title="3"></a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> --bootstrap-server localhost:9092  \</a>
+<a class="sourceLine" id="cb5-6" title="6">        --describe --topic test</a></code></pre></div>
+<h2 id="step-3-inspect-kafka-manager-ui">Step 3 : Inspect Kafka Manager UI</h2>
+<p><img src="../assets/images/2b.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<h2 id="step-4-create-a-topic-from-kafka-manager">Step 4: Create a Topic from Kafka Manager</h2>
+<p>Create a new topic <code>test2</code> with 10 partitions from KM</p>
+<p>See screenshots below</p>
+<p><img src="../assets/images/2d.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<p><img src="../assets/images/2e.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<h2 id="step-5-lets-send-some-messages">Step 5 : Let’s send some messages</h2>
+<p>On terminal-1 start <code>kafka-console-producer</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$    <span class="ex">~/apps/kafka/bin/kafka-console-producer.sh</span> \</a>
+<a class="sourceLine" id="cb6-2" title="2">        --bootstrap-server localhost:9092 --topic test</a></code></pre></div>
+<p>On terminal-2 start <code>kafka-console-consumer</code></p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-console-consumer.sh</span> \</a>
+<a class="sourceLine" id="cb7-2" title="2">        --bootstrap-server localhost:9092 --topic test</a></code></pre></div>
+<p><strong>==&gt; In producer terminal (1) type some data</strong></p>
+<p><strong>==&gt; Watch the output on consumer terminal (2)</strong></p>
+<p>Click on the image to see larger version. <a href="../assets/images/2c.png"><img src="../assets/images/2c.png" style="border: 5px solid grey ; max-width:100%;"  /></a></p>
+<h2 id="step-6-try-these">Step 6 : Try these</h2>
+<p><strong>Stop the consumer using <code>Ctrl+c</code>.</strong></p>
+<p><strong>==&gt; Start consumer with <code>from-beginning</code> flag</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$    <span class="ex">~/apps/kafka/bin/kafka-console-consumer.sh</span> \</a>
+<a class="sourceLine" id="cb8-2" title="2">    --bootstrap-server localhost:9092 --topic test --from-beginning</a></code></pre></div>
+<p><strong>=&gt; Is the consumer reading the data ‘in-order’ as we typed in producer terminal? Why or why not?</strong></p>
+<h2 id="step-7-find-out-options-for-console-producer-and-console-consumer">Step 7: Find out options for console-producer and console-consumer</h2>
+<p>Invoke <code>console-producer</code> and <code>console-consumer</code> without any arguments to find out all the options.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$    <span class="ex">~/apps/kafka/bin/kafka-console-producer.sh</span></a>
+<a class="sourceLine" id="cb9-2" title="2"></a>
+<a class="sourceLine" id="cb9-3" title="3">$    <span class="ex">~/apps/kafka/bin/kafka-console-consumer.sh</span></a></code></pre></div>
+<h2 id="step-8-read-from-a-particular-offset">Step-8: Read From a Particular Offset</h2>
+<p>Try this:</p>
+<p>You need to specify <code>topic</code>, <code>partition</code> and <code>offset</code></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-console-consumer.sh</span> --bootstrap-server localhost:9092 \</a>
+<a class="sourceLine" id="cb10-2" title="2">    --topic test --partition 1  --offset 2 </a></code></pre></div>
+<p>Play around with different parameters</p>

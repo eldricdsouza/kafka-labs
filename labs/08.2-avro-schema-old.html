@@ -1,0 +1,61 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-learn-to-manage-avro-schema">Lab : Learn to manage Avro schema</h1>
+<h2 id="step-1-read-pom.xml-in-the-kafka-labs-directory">Step 1: Read pom.xml in the kafka-labs directory</h2>
+<p>Notice the two plugins added for avro schema management using the schema registry.</p>
+<ul>
+<li>kafka-schema-registry-maven-plugin - checks compatibility of the features pointing to the Avro Schema Format (avsc) in file src/main/resources/lab08_avro/Clickinfo.avsc.</li>
+<li>avro-maven-plugin - generates avro code for execution.</li>
+</ul>
+<h2 id="step-2-inspect-the-avro-schema-file-for-clickinfo">Step 2: Inspect the Avro schema file for Clickinfo</h2>
+<p>This is schema v1 that the producer will use to write to the topic ‘avroclicks’</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$ <span class="bu">cd</span> ~/dev/kafka-labs</a>
+<a class="sourceLine" id="cb1-2" title="2">$ <span class="fu">cat</span> src/main/resources/x/lab08_avro/Clickinfo.avsc</a></code></pre></div>
+<h2 id="step-3-build-the-project-and-run-the-avro-consumer">Step 3: Build the project and run the Avro Consumer</h2>
+<p>File : <code>src/main/java/x/lab08_avro/AvroClickStreamConsumer.java</code></p>
+<ul>
+<li><p>Inspect the source code for AvroClickstreamConsumer.java. Notice the declaration for Clickinfo. This is the Java class created for the Avro schema.</p></li>
+<li>Build the Project.</li>
+</ul>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$ <span class="bu">cd</span> ~/dev/kafka-labs</a>
+<a class="sourceLine" id="cb2-2" title="2">$ <span class="ex">mvn</span> clean package</a></code></pre></div>
+<p>You should see that the target directory has classes/x/lab08_avro/Clickinfo.class created.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$ <span class="fu">ls</span> -l ~/dev/kafka-labs/target/classes/x/lab08_avro</a></code></pre></div>
+<p>It should also be part of the jar:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$ <span class="ex">jar</span> tvf target/kafka-labs-2.0-jar-with-dependencies.jar <span class="kw">|</span> <span class="fu">grep</span> Clickinfo</a></code></pre></div>
+<p>This class is automatically created by the maven plugin.</p>
+<p>Now let’s start the consumer from one Terminal (or run it from Eclipse):</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$ <span class="ex">java</span> -cp target/kafka-labs-2.0-jar-with-dependencies.jar x.lab08_avro.AvroClickstreamConsumer</a></code></pre></div>
+<ul>
+<li>The consumer should wait. Once the Producer is started, you should start to see the output appear.</li>
+</ul>
+<h2 id="step-4-run-the-avro-producer">Step 4: Run the Avro Producer</h2>
+<ul>
+<li>Inspect the source code for AvroClickstreamProducer.java. Notice the declaration for Clickinfo.</li>
+<li>Right-click on the AvroClickStreamConsumer.java in Eclipse and run it. Alternatively, run it from the command line:</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$ <span class="ex">java</span> -cp target/kafka-labs-2.0-jar-with-dependencies.jar x.lab08_avro.AvroClickstreamProducer</a></code></pre></div>
+<ul>
+<li>Are you seeing the expected outputs on both the Producer and Consumer consoles?</li>
+</ul>
+<h2 id="step-5-modify-the-avro-message-schema">Step 5: Modify the Avro message schema</h2>
+<ul>
+<li>Inspect the file Clickinfoinvalid.avsc in src/main/resources/x/lab08_avro.</li>
+<li>Change the ~/dev/kafka-labs/pom.xml such that kafka-schema-registry-maven-plugin AND avro-maven-plugin point to src/main/resources/x/lab08_avro/Clickinfoinvalid.avsc schema and do the compatibility test</li>
+</ul>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1"><span class="ex">mvn</span> io.confluent:kafka-schema-registry-maven-plugin:5.0.0:test-compatibility</a></code></pre></div>
+<ul>
+<li><p>Explain the results. Why is this schema invalid?</p></li>
+<li><p>Repeat above with src/main/resources/x/lab8-avro/Clickinfovalid.avsc. What makes this schema valid?</p></li>
+</ul>
+<h2 id="step-6-update-producer-to-use-avro-schema-v2">Step 6: Update Producer to use Avro schema V2</h2>
+<ul>
+<li>Edit AvroClickstreamProducer.java and add the “action” field to the message near line 43:</li>
+</ul>
+<pre><code>final String action = record.action;
+final Clickinfo clickdata = new Clickinfo(timestamp, session,domain,userid,cost,campaign,ip_info,action);
+</code></pre>
+<ul>
+<li>Re-build the AvroClickstreamProducer and run it</li>
+<li>In the consumer console you should see the new field appear in the output.</li>
+</ul>

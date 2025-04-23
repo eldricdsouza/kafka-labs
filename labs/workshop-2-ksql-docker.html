@@ -1,0 +1,61 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="workshop-2-kafka-use-case-click-stream-analysis-of-data-using-ksql-docker-cli">Workshop-2: Kafka Use Case: Click Stream Analysis of data using KSQL (Docker cli)</h1>
+<h3 id="overview">Overview</h3>
+<p>The problem statement is very clear, we will try to observe the click stream data using KSQL in command line</p>
+<h3 id="depends-on">Depends On</h3>
+<ul>
+<li>Docker &gt; 1.11 version</li>
+<li>Docker compose</li>
+<li>If you are running Linux as host, then for Elasticsearch container, make sure you run the following command first:</li>
+</ul>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">sudo</span> sysctl -w vm.max_map_count=262144</a></code></pre></div>
+<h3 id="run-time">Run time</h3>
+<ul>
+<li>2 hr</li>
+</ul>
+<h2 id="step-1-downloading-and-running-the-configured-dockers">Step 1: Downloading and running the configured dockers</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">git</span> clone https://github.com/confluentinc/examples.git</a>
+<a class="sourceLine" id="cb2-2" title="2"><span class="bu">cd</span> examples</a>
+<a class="sourceLine" id="cb2-3" title="3"><span class="fu">git</span> checkout 5.3.2-post</a>
+<a class="sourceLine" id="cb2-4" title="4"><span class="bu">cd</span> clickstream</a></code></pre></div>
+<p>Run the docker-compose command to start the containers. You can take a look at the <code>docker-compose.yml</code> file which will tell you what are the container we are going to start.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">docker-compose</span> up -d</a></code></pre></div>
+<p>Docker-compose is a automated way of running a lot of container as a whole. Read more about docker compose <a href="https://docs.docker.com/compose/">here</a></p>
+<p>Check the status of containers:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">docker-compose</span> ps </a></code></pre></div>
+<p>You should observe the state as <code>UP</code> for all the containers</p>
+<h2 id="step-2-creating-clickstream-data">Step 2: Creating Clickstream Data</h2>
+<p>A data generator is already running, simulating the stream of clicks. You can sample this stream by using a console consumer such as <code>kafkacat</code>:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">docker-compose</span> exec kafkacat \</a>
+<a class="sourceLine" id="cb5-2" title="2">        kafkacat -b kafka:29092 -C -c 10 -K: \</a>
+<a class="sourceLine" id="cb5-3" title="3">        -f <span class="st">&#39;\nKey  : %k\t\nValue: %s\n&#39;</span> \</a>
+<a class="sourceLine" id="cb5-4" title="4">        -t clickstream</a></code></pre></div>
+<p>If you get the message <code>Broker: Leader not available</code>, try again after a moment, as the demo is still starting up.</p>
+<p>Try removing <code>-c 10</code> and find out why only few streams (10) where visible.</p>
+<p>Try to list the data with: - status codes - by replacing <code>clickstream</code> with <code>clickstream_codes</code> - user data - by replacing <code>clickstream</code> with <code>clickstream_users</code></p>
+<h2 id="step-3-bring-ksql-to-load-streaming-data">Step 3: Bring KSQL to load Streaming Data</h2>
+<p>Launch KSQL CLI:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">docker-compose</span> exec ksql-cli ksql http://ksql-server:8080</a></code></pre></div>
+<p>You should now be in</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb7-1" title="1">ksql<span class="op">&gt;</span></a></code></pre></div>
+<h2 id="step-4-repeat-the-process-of-labs-8.3-for-creating-streaming-data-of-single-table">Step 4: Repeat the process of labs 8.3 for creating streaming data of single table</h2>
+<h2 id="step-5-moving-the-data-to-graphana">Step 5: Moving the data to Graphana</h2>
+<p>Verify the data before moving</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb8-1" title="1">ksql<span class="op">&gt;</span><span class="kw">LIST</span> <span class="kw">TABLES</span>;</a></code></pre></div>
+<p>Verify teh streams:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb9-1" title="1">ksql<span class="op">&gt;</span><span class="kw">LIST</span> STREAMS;</a></code></pre></div>
+<p>TODO: - Verify the clickstream data - Observe events per miniute</p>
+<h3 id="setting-up-elastic-cash">Setting up elastic cash</h3>
+<p>Exit KSQL CLI by preessing - <code>CTRL+D</code></p>
+<p>Setting up Elasticserach document mapping template</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="bu">cd</span> examples/clickstream/ksql/ksql-clickstream-demo/demo/</a></code></pre></div>
+<p>Now, that we are into the right directoy, run these</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="ex">docker-compose</span> exec elasticsearch bash -c <span class="st">&#39;/scripts/elastic-dynamic-template.sh&#39;</span></a>
+<a class="sourceLine" id="cb11-2" title="2"><span class="ex">docker-compose</span> exec kafka-connect bash -c <span class="st">&#39;/scripts/ksql-tables-to-grafana.sh&#39;</span></a></code></pre></div>
+<p>Note that the scripts is in the repo, that you git cloned.</p>
+<p>Load the dashboard of Graphana:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="ex">docker-compose</span> exec grafana bash -c <span class="st">&#39;/scripts/clickstream-analysis-dashboard.sh&#39;</span></a></code></pre></div>
+<p>Open your browser using the URL output from the previous step, with the default login id and password as <code>admin</code> and <code>admin</code> respectively</p>
+<p>Observe the dashboard demonstrates a series of streaming functionality.</p>
+<h2 id="congratulations-you-have-completed-the-lab">Congratulations! You have completed the lab!</h2>

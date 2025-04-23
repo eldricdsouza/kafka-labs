@@ -1,0 +1,24 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-5-seek-to-various-offsets">Lab 5: Seek To Various Offsets</h1>
+<h2 id="overview">Overview</h2>
+<p>Seek within partition</p>
+<h2 id="depends-on">Depends On</h2>
+<h2 id="run-time">Run time</h2>
+<p>20 mins</p>
+<h2 id="step-1-run-kafkacat-to-see-offsets-and-messages">Step 1 : Run Kafkacat to see offsets and messages</h2>
+<p>On a terminal, run Kafkacat. Observe the offsets and messages.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t test -f <span class="st">&#39;Partition %t[%p], offset: %o, key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<h2 id="step-2-seeking-consumer">Step 2 : Seeking Consumer</h2>
+<ul>
+<li>Inspect file : <code>src/main/java/x/lab05_offsets/SeekingConsumer.java</code><br />
+</li>
+<li>Fix the TODO items Use reference Java API <a href="https://kafka.apache.org/0100/javadoc/index.html?org/apache/kafka/clients/consumer/KafkaConsumer.html">for Consumer</a></li>
+<li>Run the producer in Eclipse,
+<ul>
+<li>Right click on file</li>
+<li>Run as ‘Java Application’</li>
+</ul></li>
+</ul>
+<h2 id="step-3-work-through-todos">Step-3: Work Through TODOs</h2>
+<p>Observe the behavior</p>

@@ -1,0 +1,38 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-9.3-metrics---traffic-data">Lab 9.3: Metrics - Traffic Data</h1>
+<h3 id="overview">Overview</h3>
+<p>Use metrics library to report traffic stats</p>
+<h3 id="depends-on">Depends On</h3>
+<h3 id="run-time">Run time</h3>
+<p>40 mins</p>
+<h2 id="step-1-x.lab09_metrics.trafficreporter1">Step 1: x.lab09_metrics.TrafficReporter1</h2>
+<ul>
+<li>File : <code>src/main/java/x/lab09_metrics/TrafficReporter1.java</code></li>
+<li>Fix TODO items in this file</li>
+<li>Run the file</li>
+<li>Run <code>ClickstreamProducer</code> to supply data</li>
+<li>Design dashboards in Grafana to track metrics</li>
+</ul>
+<h2 id="step-2-x.lab09_metrics.trafficreporter2">Step 2: x.lab09_metrics.TrafficReporter2</h2>
+<p>Workflow:</p>
+<ul>
+<li>ClickstreamProducer —&gt;topic:clickstream
+<ul>
+<li>topic:clickstream –&gt; StreamingConsumer4_GroupBy –&gt; topic:domainCount
+<ul>
+<li>topic:domainCount –&gt; TrafficReporter2 –&gt; metrics system</li>
+</ul></li>
+</ul></li>
+<li>File : <code>src/main/java/x/lab09_metrics/TrafficReporter2.java</code></li>
+<li>Fix TODO items in this file</li>
+<li>Run the file</li>
+<li>Run <code>ClickstreamProducer</code></li>
+<li>Run <code>StreamingConsumer4_GroupBy</code></li>
+<li>verify at console output</li>
+<li>Design dashboards in Grafana to track metrics</li>
+</ul>
+<h2 id="bonus-lab">Bonus Lab:</h2>
+<p>Can you instrument <code>src/main/java/x/utils/ClickStreamProducer.java</code> to publish metrics?</p>
+<h2 id="class-discussion">Class Discussion</h2>
+<p>Discuss your findings with the class and instructor.</p>

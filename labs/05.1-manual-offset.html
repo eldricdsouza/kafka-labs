@@ -1,0 +1,44 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<h1 id="lab-5.1-manual-offset">Lab 5.1: Manual Offset</h1>
+<h2 id="overview">Overview</h2>
+<p>Seek within partition</p>
+<h2 id="depends-on">Depends On</h2>
+<h2 id="run-time">Run time</h2>
+<p>20 mins</p>
+<h2 id="step-1-consumer">Step-1 : Consumer</h2>
+<p>Inspect file : <code>src/main/java/x/lab05_offsets/ManualOffsetConsumer.java</code></p>
+<p>Fix the <strong>TODO-1</strong></p>
+<p>Disable auto commit like this</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode java"><code class="sourceCode java"><a class="sourceLine" id="cb1-1" title="1">props.<span class="fu">put</span>(<span class="st">&quot;enable.auto.commit&quot;</span>, <span class="st">&quot;false&quot;</span>);</a></code></pre></div>
+<p><strong>Run the consumer in Eclipse</strong>, by</p>
+<ul>
+<li>Right click on file</li>
+<li>Run as ‘Java Application’</li>
+</ul>
+<h2 id="step-2-inspect-the-output-from-consumer">Step-2: Inspect the output from Consumer</h2>
+<p>You will see consumer processing messages.</p>
+<p>Pay special attention to OFFSETs.</p>
+<p>Now <strong>stop the consumer</strong> program</p>
+<h2 id="step-3-rerun-the-consumer">Step-3: Rerun the consumer</h2>
+<p>Note: It may take a few seconds to establish connection to Kafka (because we didn’t do a clean shutdown)</p>
+<p><strong>Observe the consumer output, you will see the same messages. Can you explain why?</strong></p>
+<p><strong>Stop the consumer</strong></p>
+<h2 id="step-4-enable-commitsync">Step-4: Enable commitSync</h2>
+<p>Uncomment the following line to enable commitSync</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode java"><code class="sourceCode java"><a class="sourceLine" id="cb2-1" title="1">consumer.<span class="fu">commitSync</span>();</a></code></pre></div>
+<h2 id="step-5-rerun-consumer">Step-5: Rerun Consumer</h2>
+<ul>
+<li>Re-run consumer again</li>
+<li>Observe what data it is getting</li>
+<li>stop the consumer</li>
+<li>Start the consumer again.</li>
+<li>Observe the data. What do you see? Is it still getting ‘old data’?</li>
+</ul>
+<h2 id="step-6-send-some-new-data">Step-6: Send Some New Data</h2>
+<p>Use kafkacat to send a couple of new messages into the topic</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$    <span class="ex">kafkacat</span> -P -b localhost:9092   -t test</a></code></pre></div>
+<p>Type in some data</p>
+<pre class="console"><code>earth
+mars</code></pre>
+<p>You should see it comes out via consumer.</p>
+<h2 id="step-7-discuss-your-findings">Step-7: Discuss Your Findings</h2>

@@ -1,0 +1,69 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-2.2-kafkacat">Lab 2.2: Kafkacat</h1>
+<h3 id="overview">Overview</h3>
+<p><a href="https://github.com/edenhill/kcat">kafkacat</a> is really useful tool to deal with Kafka. In this lab, we will setup Kafkacat and use it</p>
+<h3 id="run-time">Run time</h3>
+<p>15 minutes</p>
+<h2 id="step-1-install-kafkacat">Step-1: Install <code>kafkacat</code></h2>
+<p>On ubuntu systems:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="fu">sudo</span> apt update</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3">$   <span class="fu">sudo</span> apt install -y kafkacat</a></code></pre></div>
+<h2 id="step-2-get-kafka-cluster-info">Step-2: Get Kafka Cluster Info</h2>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="ex">kafkacat</span> -L   -b localhost:9092</a></code></pre></div>
+<h2 id="step-3-producer-consumer-mode">Step-3: Producer / Consumer mode</h2>
+<p><strong>On terminal-1 start Kafkacat in producer mode</strong></p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">kafkacat</span> -P -b localhost:9092   -t test</a></code></pre></div>
+<p><strong>On another terminal(2) start kafkacat in consumer mode</strong></p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="co"># wait for new messages</span></a>
+<a class="sourceLine" id="cb4-2" title="2">$   <span class="ex">kafkacat</span> -C -b localhost:9092   -t test</a></code></pre></div>
+<p><strong>Then go ahead and type some messages in terminal-1 (producer) and observe the output on consumer terminal (2)</strong></p>
+<h2 id="step-4-more-formatting-options">Step-4: More Formatting Options</h2>
+<p><strong>Close the kafkacat consumer by hitting Ctrl+C on terminal-2</strong></p>
+<p>And try the following:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t test -f <span class="st">&#39;Partition %t[%p], offset: %o, key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<h2 id="steps-below-are-optional">Steps below are optional…</h2>
+<hr />
+<h2 id="step-5-more-options-for-producing">Step-5: More Options for Producing</h2>
+<p>Produce messages, read from STDIN to topic <code>test</code></p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$   <span class="ex">kafkacat</span> -P -b localhost:9092   -t test</a></code></pre></div>
+<p>Or you can pipe a file into a topic</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$   <span class="fu">cat</span> README.txt   <span class="kw">|</span>  <span class="ex">kafkacat</span> -P  -b localhost:9092  -t test</a></code></pre></div>
+<p>Producing with key-values</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$   <span class="ex">kafkacat</span> -P -b localhost:9092 -t test -K :</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="co"># Then type</span></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="co">#    k1:v1</span></a>
+<a class="sourceLine" id="cb8-4" title="4"><span class="co">#    k2:v2</span></a></code></pre></div>
+<p>Produce from a file. Say our file <code>data.txt</code> has data in this format:</p>
+<pre class="text"><code>k1:v1
+k2:v2
+k3:v3</code></pre>
+<p>Send it like this</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$   <span class="ex">kafkacat</span> -P -b localhost:9092 -t test -K: -l data.txt</a></code></pre></div>
+<h2 id="step-6-more-options-for-consuming">Step-6: More Options for Consuming</h2>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># quiet mode</span></a>
+<a class="sourceLine" id="cb11-2" title="2">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092   -t test</a>
+<a class="sourceLine" id="cb11-3" title="3"></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co"># wait for new messages</span></a>
+<a class="sourceLine" id="cb11-5" title="5">$   <span class="ex">kafkacat</span> -C -b localhost:9092   -t test</a>
+<a class="sourceLine" id="cb11-6" title="6"></a>
+<a class="sourceLine" id="cb11-7" title="7"><span class="co"># exit after reading all messages</span></a>
+<a class="sourceLine" id="cb11-8" title="8">$   <span class="ex">kafkacat</span> -C -b localhost:9092   -t test  -e</a>
+<a class="sourceLine" id="cb11-9" title="9"></a>
+<a class="sourceLine" id="cb11-10" title="10"><span class="co"># only read last 10 messages and exit</span></a>
+<a class="sourceLine" id="cb11-11" title="11">$   <span class="ex">kafkacat</span> -C -b localhost:9092   -t test  -o -10 -e</a></code></pre></div>
+<p>More formatting options</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># print key, value</span></a>
+<a class="sourceLine" id="cb12-2" title="2">$   <span class="ex">kafkacat</span> -C -b localhost:9092 -t test -f <span class="st">&#39;key: %k, value: %s \n&#39;</span></a>
+<a class="sourceLine" id="cb12-3" title="3"></a>
+<a class="sourceLine" id="cb12-4" title="4"><span class="co"># more detailed output</span></a>
+<a class="sourceLine" id="cb12-5" title="5">$   <span class="ex">kafkacat</span> -C -b localhost:9092 -t test -f <span class="st">&#39;Topic %t[%p], offset: %o, key: %k, value: %s, (length: %S bytes) \n&#39;</span></a></code></pre></div>
+<p>Print timestamp of messages (%T)</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$    <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t test -f <span class="st">&#39;Partition %t[%p], offset: %o, timestamp: %T,  key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<p>More usage details <a href="https://github.com/edenhill/kcat">see Kafkacat page</a></p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://www.vertica.com/docs/9.2.x/HTML/Content/Authoring/KafkaIntegrationGuide/TroubleShooting/UsingKafkacatToTroubleShootIssues.htm">Using Kafkacat to troubleshoot Kafka</a></li>
+<li><a href="https://dev.to/de_maric/learn-how-to-use-kafkacat-the-most-versatile-kafka-cli-client-1kb4">Learn how to use Kafkacat</a></li>
+</ul>

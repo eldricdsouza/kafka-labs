@@ -1,0 +1,29 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-7.2-kafka-streams---foreach">Lab 7.2: Kafka Streams - Foreach</h1>
+<h2 id="overview">Overview</h2>
+<p>Setup a Kafka streaming application</p>
+<h2 id="depends-on">Depends On</h2>
+<h2 id="run-time">Run time</h2>
+<p>20 mins</p>
+<h2 id="step-1-streaming-consumer-1">Step 1 : Streaming Consumer 1</h2>
+<p>This consumer will read and print a KafkaStream.</p>
+<p>File : <code>src/main/java/x/lab07_streaming/StreamingConsumer2_Foreach.java</code></p>
+<p>Inspect the file and fix the TODO items. Use reference <a href="https://kafka.apache.org/0102/javadoc/index.html">Kafka Java API</a></p>
+<p><strong>Run the <code>lab07_streaming/StreamingConsumer2_Foreach</code> in Eclipse</strong></p>
+<h2 id="step-2-run-clickstreamproducer">Step 2: Run <code>ClickstreamProducer</code></h2>
+<p><strong>Run the <code>utils.ClickStreamProducer</code> in Eclipse</strong></p>
+<p>Expected output</p>
+<pre class="console"><code>
+[INFO ] 2018-07-22 14:18:52.552 [main] StreamingConsumer2_Foreach:main(55) - kstreams starting on clickstream
+
+[KSTREAM-SOURCE-0000000000]: facebook.com, {&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[DEBUG] 2018-07-22 14:18:52.712 [kafka-streaming-consumer1-9a276a4b-0a94-4907-957b-4b973dd06a2b-StreamThread-1] StreamingConsumer2_Foreach:apply(47) - key:facebook.com, value:{&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[KSTREAM-SOURCE-0000000000]: cnn.com, {&quot;timestamp&quot;:1451635200020,&quot;session&quot;:&quot;session_66&quot;,&quot;domain&quot;:&quot;cnn.com&quot;,&quot;cost&quot;:31,&quot;user&quot;:&quot;user_29&quot;,&quot;campaign&quot;:&quot;campaign_3&quot;,&quot;ip&quot;:&quot;ip_49&quot;,&quot;action&quot;:&quot;blocked&quot;}
+
+[DEBUG] 2018-07-22 14:18:52.712 [kafka-streaming-consumer1-9a276a4b-0a94-4907-957b-4b973dd06a2b-StreamThread-1] StreamingConsumer2_Foreach:apply(47) - key:cnn.com, value:{&quot;timestamp&quot;:1451635200020,&quot;session&quot;:&quot;session_66&quot;,&quot;domain&quot;:&quot;cnn.com&quot;,&quot;cost&quot;:31,&quot;user&quot;:&quot;user_29&quot;,&quot;campaign&quot;:&quot;campaign_3&quot;,&quot;ip&quot;:&quot;ip_49&quot;,&quot;action&quot;:&quot;blocked&quot;}
+
+[KSTREAM-SOURCE-0000000000]: foxnews.com, {&quot;timestamp&quot;:1451635200010,&quot;session&quot;:&quot;session_224&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:17,&quot;user&quot;:&quot;user_89&quot;,&quot;campaign&quot;:&quot;campaign_4&quot;,&quot;ip&quot;:&quot;ip_57&quot;,&quot;action&quot;:&quot;viewed&quot;}
+</code></pre>

@@ -1,0 +1,41 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-4.2-compression-benchmarking">Lab 4.2: Compression Benchmarking</h1>
+<h3 id="overview">Overview</h3>
+<p>Understand different compression codecs available for compression of messages and their performance</p>
+<h3 id="depends-on">Depends On</h3>
+<p>lab 3</p>
+<h3 id="run-time">Run time</h3>
+<p>30 mins</p>
+<h2 id="step-1-create-a-compression-topic">Step 1 : Create a Compression topic</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    $   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span>  --bootstrap-server localhost:9092  --create \</a>
+<a class="sourceLine" id="cb1-2" title="2">        --topic compression --replication-factor 1  --partitions 2</a></code></pre></div>
+<h2 id="step-2-producer">Step 2 : Producer</h2>
+<ul>
+<li>Inspect file : <code>src/main/java/x/lab04_benchmark/CompressedProducer.java</code><br />
+</li>
+<li>Fix all TODO items, using Eclipse (or any other editor).</li>
+</ul>
+<h2 id="step-2-run-the-producer">Step 2 : Run the producer</h2>
+<ul>
+<li>Right click on ‘src/main/java/x/lab04_benchmark/CompressedProducer.java’</li>
+<li>Run as ‘Java Application’</li>
+</ul>
+<h2 id="step-3-record-producer-times-for-this-codec">Step 3: Record producer times for this codec</h2>
+<ul>
+<li>Producer console output will show total time and throughput. Copy this output to notepad/excel</li>
+</ul>
+<h2 id="step-4-try-other-compression-codecs">Step 4: Try other compression codecs</h2>
+<ul>
+<li>Edit CompressedProducer.java and change the codec</li>
+<li>Re-run Step 3 above and record benchmark times for this codec</li>
+</ul>
+<h2 id="step-5-create-performance-table">Step 5: Create performance table</h2>
+<ul>
+<li>Create a table showing performance numbers for different codecs</li>
+</ul>
+<h2 id="bonus-lab">Bonus lab :</h2>
+<p>Compression can help to reduce the size of data we are sending out.<br />
+Can you figure out a way to find the amount of data sent by the producer?<br />
+You may want to use OS level tools to measure this?<br />
+Share what you find with the class.</p>

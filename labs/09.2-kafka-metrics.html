@@ -1,0 +1,40 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-9.2-metrics---intro">Lab 9.2: Metrics - intro</h1>
+<h2 id="overview">Overview</h2>
+<p>Learn Metrics library, Graphite, Grafana</p>
+<h2 id="depends-on">Depends On</h2>
+<h2 id="run-time">Run time</h2>
+<p>20 mins</p>
+<p><strong>Instructor: Demo this lab</strong></p>
+<h2 id="step-1-access-grafana">Step 1: Access Grafana</h2>
+<p>Bring up Grafana UI on the lab VM.</p>
+<p>username : admin</p>
+<p>password : will be provided (the same password as jupyter)</p>
+<h2 id="step-2-add-graphite-datasource">Step 2: Add Graphite Datasource</h2>
+<p>Follow the screenshots below to add Graphite data source</p>
+<p><img src="../assets/images/metrics-1.png" /></p>
+<p><img src="../assets/images/metrics-2.png" /></p>
+<p><img src="../assets/images/metrics-3.png" /></p>
+<p>Make sure the Graphite url is <strong>http://localhost:8001/graphite/</strong></p>
+<p><strong>Save the datasource and make sure it works fine</strong></p>
+<h2 id="step-3-import-grafana-dashboard">Step 3: Import Grafana Dashboard</h2>
+<p><strong>Go to Dashboard –&gt; Manage</strong></p>
+<p><strong>Click Import</strong></p>
+<p><strong>Choose Upload JSON file</strong></p>
+<p><strong>Select the following JSON file</strong></p>
+<p>file: <code>kafka-labs/src/main/java/x/lab09_metrics/kafka-metrics-dashboard.json</code></p>
+<p><strong>Make sure Dashboard is imported</strong></p>
+<h2 id="step-4-inspect-consumerwithmetrics">Step 4: Inspect <code>ConsumerWithMetrics</code></h2>
+<p>file : <code>src/main/java/x/lab09_metrics/ConsumerWithMetrics.java</code></p>
+<p><strong>Inspect metrics usage</strong></p>
+<p><strong>Run this file in Eclipse</strong></p>
+<h2 id="step-5-inspect-producerwithmetrics">Step 5: Inspect <code>ProducerWithMetrics</code></h2>
+<p>file : <code>src/main/java/x/lab09_metrics/ProducerWithMetrics.java</code></p>
+<p><strong>Inspect metrics usage</strong></p>
+<p><strong>Run this file in Eclipse</strong></p>
+<h2 id="step-6-inspect-grafana-dashboard">Step 6: Inspect Grafana Dashboard</h2>
+<p><strong>Enjoy the shiny metrics</strong></p>
+<h2 id="step-7-add-a-new-metrics-panel">Step 7: Add a New Metrics Panel</h2>
+<p><strong>Click on the <code>PLUS</code> sign on top to create a new panel</strong></p>
+<p><strong>Then add a metric (can be a duplicate one) from scratch, so you understand the process</strong></p>

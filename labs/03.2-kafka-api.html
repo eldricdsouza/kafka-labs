@@ -1,0 +1,74 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-3.2-simple-producer-consumer">Lab 3.2 : Simple Producer / Consumer</h1>
+<h2 id="instructor">Instructor</h2>
+<p><strong>Please demo this example, and do the lab together with students, step by step</strong></p>
+<h2 id="overview">Overview</h2>
+<p>Run simple Producer / Consumer</p>
+<h2 id="depends-on">Depends On</h2>
+<p>None</p>
+<h2 id="run-time">Run time</h2>
+<p>30 mins</p>
+<h2 id="step-1-create-test-topic">Step 1 : Create <code>test</code> topic</h2>
+<p>IF you haven’t done before, let’s create a <code>test</code> topic</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span>  --bootstrap-server localhost:9092   \</a>
+<a class="sourceLine" id="cb1-2" title="2">       --create --topic test --replication-factor 1  --partitions 2</a></code></pre></div>
+<h2 id="step-2-run-a-console-consumer">Step 2 : Run a console consumer</h2>
+<p>In a terminal</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$  <span class="ex">~/apps/kafka/bin/kafka-console-consumer.sh</span> \</a>
+<a class="sourceLine" id="cb2-2" title="2">        --bootstrap-server localhost:9092 \</a>
+<a class="sourceLine" id="cb2-3" title="3">        --property print.key=true --property key.separator=<span class="st">&quot;:&quot;</span> \</a>
+<a class="sourceLine" id="cb2-4" title="4">        --topic test</a></code></pre></div>
+<p>or if you have Kafkacat</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t test -f <span class="st">&#39;Partition %t[%p], offset: %o, key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<h2 id="step-3-simple-producer">Step 3 : Simple Producer</h2>
+<ul>
+<li>Inspect file : <code>src/main/java/x/lab03_api_intro/SimpleProducer.java</code>.<br />
+</li>
+<li>Run the Producer In Eclipse,
+<ul>
+<li>Right click on ‘src/main/java/x/lab03_api_intro/SimpleProducer.java’</li>
+<li>Run as ‘Java Application’</li>
+</ul></li>
+</ul>
+<p>In Eclipse console, you should see output as follows:</p>
+<pre class="console"><code>sending : ProducerRecord(topic=test, partition=null, key=1, value=Hello world, timestamp=null)</code></pre>
+<h2 id="step-4-monitor-kafka-console-consumer">Step 4 : Monitor Kafka console consumer</h2>
+<p>The messages should show up in Kafka console terminal !<br />
+Yay !!</p>
+<h2 id="step-5-consumer">Step 5 : Consumer</h2>
+<ul>
+<li>Inspect file <code>src/main/java/x/lab03_api_intro/SimpleConsumer.java</code><br />
+</li>
+<li>Run the Consumer In Eclipse,
+<ul>
+<li>Right click on ‘src/main/java/x/lab03_api_intro/SimpleProducer.java’</li>
+<li>Run as ‘Java Application’</li>
+</ul></li>
+</ul>
+<p>This will keep running.</p>
+<h2 id="step-6-run-the-producer-again">Step 6 : Run the Producer again</h2>
+<ul>
+<li>Right click on <code>src/main/java/x/lab03_api_intro/SimpleProducer.java</code></li>
+<li>Run as ‘Java Application’</li>
+</ul>
+<p><strong>=&gt; In Eclipse, monitor output from two of these programs</strong><br />
+Hint : you may need to switch to Debug view</p>
+<p><strong>=&gt; Also what is happening in Kafka console consumer?</strong></p>
+<h2 id="step-7-run-two-consumers">Step 7: Run Two Consumers</h2>
+<p>Stop the running consumer first (in Eclipse)</p>
+<p>Leave console consumer running.</p>
+<p>Run two instances of the <code>Simple Consumer</code> (from Eclipse)</p>
+<p>Also run <code>SimpleProducer</code> from Eclipse.</p>
+<p>How many messages each consumer get? Can you explain? :smile:</p>
+<h2 id="step-8-inspect-kafka-manager">Step 8: Inspect Kafka Manager</h2>
+<p>Look at partition based consumption for <code>test</code> topic from Kafka manager. See screenshots below</p>
+<p><strong>Instructor, please explain the stats</strong></p>
+<p><img src="../assets/images/3.2a.png" style="border: 5px solid grey ; width:90%;" /></p>
+<p><img src="../assets/images/3.2b.png" style="border: 5px solid grey ; width:90%;" /></p>
+<h2 id="step-9-run-three-consumers">Step 9: Run Three Consumers</h2>
+<p>Stop the running consumers first (in Eclipse)</p>
+<p>Leave console consumer running.</p>
+<p>Run three instances of the <code>Simple Consumer</code> (from Eclipse)</p>
+<p>Also run <code>SimpleProducer</code> from Eclipse.</p>
+<p>How many messages each consumer get? Can you explain? :smile:</p>

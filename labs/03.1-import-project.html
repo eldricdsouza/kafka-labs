@@ -1,0 +1,48 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-3.1-import-kafka-project">Lab 3.1 : Import Kafka Project</h1>
+<h3 id="overview">Overview</h3>
+<p>Import the ‘kafka-labs’ project into your favorite IDE.</p>
+<h3 id="depends-on">Depends On</h3>
+<p>None</p>
+<h3 id="run-time">Run time</h3>
+<p>10 mins</p>
+<h2 id="step-0-to-instructor">STEP 0: To Instructor</h2>
+<p>Walk through this project on screen first.</p>
+<h2 id="step-1-login-to-the-vm-via-ssh">STEP 1: Login to the VM via SSH</h2>
+<p>Instructor will provide details.</p>
+<h2 id="step-2-get-kafka-labs-project">Step 2: Get ‘kafka-labs’ project</h2>
+<p>From terminal, execute the following</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    <span class="co"># make sure we do this in ~/dev dir</span></a>
+<a class="sourceLine" id="cb1-2" title="2">    $   <span class="bu">cd</span>  <span class="va">$HOME</span>/dev</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4">    <span class="co"># Instructor will provide the URL</span></a>
+<a class="sourceLine" id="cb1-5" title="5">    $   <span class="fu">wget</span> <span class="op">&lt;</span>LAB URL<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb1-6" title="6"></a>
+<a class="sourceLine" id="cb1-7" title="7">    $   <span class="fu">unzip</span>  kafka-labs.zip</a></code></pre></div>
+<h2 id="step-3-login-to-the-vm-via-vnc">STEP 3: Login to the VM via VNC</h2>
+<p>Instructor will provide details.</p>
+<h2 id="step-4-open-kafka-labs-project-in-eclipse">STEP 4: Open ‘kafka-labs’ Project In Eclipse</h2>
+<p>This is a maven project. And can be readily opened by Eclipse or IntelliJ.</p>
+<ul>
+<li>Right click on ‘Projects’ view</li>
+<li>Select ‘Import’</li>
+<li>Select ‘Existing Maven Projects’</li>
+<li>Navigate to ‘kafka-labs’ directory and select the directory</li>
+</ul>
+<p><img src="../assets/images/3.1a.png" style="border: 5px solid grey ; max-width:100%;" /></p>
+<p><br clear="all"/></p>
+<h2 id="step-5-inspect-clickstreamgenerator">STEP 5: Inspect ‘ClickstreamGenerator’</h2>
+<p>Inspect file : <code>src/main/java/x/utils/ClickStreamGenerator.java</code><br />
+This file generates random clickstream data that we will use.</p>
+<p><strong>=&gt; Right-click on <code>ClickStreamGenerator.java</code> file and run it.</strong></p>
+<p>Here is a sample output:</p>
+<pre class="console"><code>
+1451635200005,ip_67,user_16,clicked,facebook.com,campaign_5,91,session_251
+1451635200010,ip_57,user_89,viewed,foxnews.com,campaign_4,17,session_224
+...
+
+{&quot;timestamp&quot;:1451635200055,&quot;session&quot;:&quot;session_57&quot;,&quot;domain&quot;:&quot;twitter.com&quot;,&quot;cost&quot;:24,&quot;user&quot;:&quot;user_31&quot;,&quot;campaign&quot;:&quot;campaign_1&quot;,&quot;ip&quot;:&quot;ip_64&quot;,&quot;action&quot;:&quot;blocked&quot;}
+{&quot;timestamp&quot;:1451635200060,&quot;session&quot;:&quot;session_188&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:26,&quot;user&quot;:&quot;user_33&quot;,&quot;campaign&quot;:&quot;campaign_4&quot;,&quot;ip&quot;:&quot;ip_99&quot;,&quot;action&quot;:&quot;clicked&quot;}</code></pre>
+<h2 id="done">Done 👏</h2>
+<p>Great.. now your environment is setup!</p>

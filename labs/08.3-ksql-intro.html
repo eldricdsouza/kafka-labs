@@ -1,0 +1,55 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-1-run-ksql">Lab 1 : Run KSQL</h1>
+<h2 id="step-1-start-the-ksql-cli-from-home-directory">Step 1: Start the KSQL CLI from Home directory</h2>
+<p>First create a directory where KSQL will store logs</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    $ <span class="bu">cd</span> confluent<span class="kw">;</span> <span class="fu">mkdir</span> -p ksql_logs</a>
+<a class="sourceLine" id="cb1-2" title="2">    $ <span class="bu">cd</span> confluent</a>
+<a class="sourceLine" id="cb1-3" title="3">    $ <span class="va">LOG_DIR=</span>./ksql_logs <span class="ex">bin/ksql</span></a></code></pre></div>
+<p>You should now be in the KSQL CLI</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">ksql</span><span class="op">&gt;</span></a></code></pre></div>
+<h2 id="step-2-create-a-ksql-stream">Step 2: Create a KSQL Stream</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">ksql</span><span class="op">&gt;</span> CREATE STREAM clickviews </a>
+<a class="sourceLine" id="cb3-2" title="2"><span class="ex">WITH</span>  (KAFKA_TOPIC=<span class="st">&#39;avroclicks&#39;</span>, VALUE_FORMAT=<span class="st">&#39;AVRO&#39;</span>);</a>
+<a class="sourceLine" id="cb3-3" title="3"></a>
+<a class="sourceLine" id="cb3-4" title="4"><span class="ex">ksql</span><span class="op">&gt;</span> SHOW streams<span class="kw">;</span></a>
+<a class="sourceLine" id="cb3-5" title="5"> <span class="ex">Stream</span> Name <span class="kw">|</span> <span class="ex">Kafka</span> Topic <span class="kw">|</span> <span class="ex">Format</span> </a>
+<a class="sourceLine" id="cb3-6" title="6"><span class="ex">------------------------------------</span></a>
+<a class="sourceLine" id="cb3-7" title="7"> <span class="ex">CLICKVIEWS</span>  <span class="kw">|</span> <span class="ex">avroclicks</span>  <span class="kw">|</span> <span class="ex">AVRO</span>   </a>
+<a class="sourceLine" id="cb3-8" title="8"><span class="ex">------------------------------------</span></a>
+<a class="sourceLine" id="cb3-9" title="9"></a>
+<a class="sourceLine" id="cb3-10" title="10"><span class="ex">ksql</span><span class="op">&gt;</span>DESCRIBE clickviews<span class="kw">;</span></a>
+<a class="sourceLine" id="cb3-11" title="11"></a>
+<a class="sourceLine" id="cb3-12" title="12"><span class="ex">Name</span>                 : CLICKVIEWS</a>
+<a class="sourceLine" id="cb3-13" title="13"> <span class="ex">Field</span>     <span class="kw">|</span> <span class="ex">Type</span>                      </a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="ex">---------------------------------------</span></a>
+<a class="sourceLine" id="cb3-15" title="15"> <span class="ex">ROWTIME</span>   <span class="kw">|</span> <span class="ex">BIGINT</span>           (system) </a>
+<a class="sourceLine" id="cb3-16" title="16"> <span class="ex">ROWKEY</span>    <span class="kw">|</span> <span class="ex">VARCHAR</span>(STRING)  <span class="kw">(</span><span class="ex">system</span><span class="kw">)</span> </a>
+<a class="sourceLine" id="cb3-17" title="17"> <span class="ex">TIMESTAMP</span> <span class="kw">|</span> <span class="ex">BIGINT</span>                    </a>
+<a class="sourceLine" id="cb3-18" title="18"> <span class="ex">SESSION</span>   <span class="kw">|</span> <span class="ex">VARCHAR</span>(STRING)           </a>
+<a class="sourceLine" id="cb3-19" title="19"> <span class="ex">DOMAIN</span>    <span class="kw">|</span> <span class="ex">VARCHAR</span>(STRING)           </a>
+<a class="sourceLine" id="cb3-20" title="20"> <span class="ex">USER</span>      <span class="kw">|</span> <span class="ex">VARCHAR</span>(STRING)           </a>
+<a class="sourceLine" id="cb3-21" title="21"> <span class="ex">COST</span>      <span class="kw">|</span> <span class="ex">BIGINT</span>                    </a>
+<a class="sourceLine" id="cb3-22" title="22"> <span class="ex">CAMPAIGN</span>  <span class="kw">|</span> <span class="ex">VARCHAR</span>(STRING)           </a>
+<a class="sourceLine" id="cb3-23" title="23"> <span class="ex">IP</span>        <span class="kw">|</span> <span class="ex">VARCHAR</span>(STRING)           </a>
+<a class="sourceLine" id="cb3-24" title="24"><span class="ex">---------------------------------------</span></a>
+<a class="sourceLine" id="cb3-25" title="25"></a>
+<a class="sourceLine" id="cb3-26" title="26"><span class="ex">ksql</span><span class="op">&gt;</span> select * from clickviews<span class="kw">;</span></a></code></pre></div>
+<p>The select statement will wait for data to appear in the stream. Leave it running.</p>
+<h2 id="step-3-start-the-avroclickstreamproducer-from-lab-8.2">Step 3: Start the AvroClickstreamProducer from Lab 8.2</h2>
+<p>Refer to instructions in that lab to start it</p>
+<p>In the ksql terminal, you should start seeing output like:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">1548522101848</span> <span class="kw">|</span> <span class="ex">session_251</span> <span class="kw">|</span> <span class="ex">1451635200005</span> <span class="kw">|</span> <span class="ex">session_251</span> <span class="kw">|</span> <span class="ex">facebook.com</span> <span class="kw">|</span> <span class="ex">user_16</span> <span class="kw">|</span> <span class="ex">91</span> <span class="kw">|</span> <span class="ex">campaign_5</span> <span class="kw">|</span> <span class="ex">ip_67</span></a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="ex">1548522102856</span> <span class="kw">|</span> <span class="ex">session_224</span> <span class="kw">|</span> <span class="ex">1451635200010</span> <span class="kw">|</span> <span class="ex">session_224</span> <span class="kw">|</span> <span class="ex">foxnews.com</span> <span class="kw">|</span> <span class="ex">user_89</span> <span class="kw">|</span> <span class="ex">17</span> <span class="kw">|</span> <span class="ex">campaign_4</span> <span class="kw">|</span> <span class="ex">ip_57</span></a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="ex">1548522103857</span> <span class="kw">|</span> <span class="ex">session_160</span> <span class="kw">|</span> <span class="ex">1451635200015</span> <span class="kw">|</span> <span class="ex">session_160</span> <span class="kw">|</span> <span class="ex">facebook.com</span> <span class="kw">|</span> <span class="ex">user_53</span> <span class="kw">|</span> <span class="ex">73</span> <span class="kw">|</span> <span class="ex">campaign_1</span> <span class="kw">|</span> <span class="ex">ip_20</span></a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="ex">1548522104857</span> <span class="kw">|</span> <span class="ex">session_66</span> <span class="kw">|</span> <span class="ex">1451635200020</span> <span class="kw">|</span> <span class="ex">session_66</span> <span class="kw">|</span> <span class="ex">cnn.com</span> <span class="kw">|</span> <span class="ex">user_29</span> <span class="kw">|</span> <span class="ex">31</span> <span class="kw">|</span> <span class="ex">campaign_3</span> <span class="kw">|</span> <span class="ex">ip_49</span></a>
+<a class="sourceLine" id="cb4-5" title="5"><span class="ex">...</span></a></code></pre></div>
+<p>Now terminate the SELECT statement using Ctrl-C.</p>
+<h2 id="step-4-create-a-ksql-table-to-count-number-of-clicks-by-domain">Step 4: Create a KSQL Table to count number of clicks by domain</h2>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">ksql</span><span class="op">&gt;</span> CREATE TABLE click_counts AS</a>
+<a class="sourceLine" id="cb5-2" title="2">      <span class="ex">SELECT</span> domain, count(*) <span class="ex">FROM</span> clickviews </a>
+<a class="sourceLine" id="cb5-3" title="3">          <span class="ex">GROUP</span> BY domain<span class="kw">;</span></a>
+<a class="sourceLine" id="cb5-4" title="4"></a>
+<a class="sourceLine" id="cb5-5" title="5"><span class="ex">ksql</span><span class="op">&gt;</span> SELECT * from click_counts<span class="kw">;</span></a></code></pre></div>
+<p>Leave the select running and start the AvroClickstreamProducer again.</p>
+<p>What output are you seeing in KSQL?</p>

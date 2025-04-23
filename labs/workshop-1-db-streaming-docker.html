@@ -1,0 +1,210 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="workshop-1-kafka-use-case-connecting-to-mysql-database-using-kafka-connect">Workshop-1: Kafka Use Case: Connecting to MySQL database using Kafka connect</h1>
+<h3 id="overview">Overview</h3>
+<p>We will try to connect with MySql Database over Kafka-connect</p>
+<h3 id="depends-on">Depends On</h3>
+<ul>
+<li>Docker &gt; 1.11 version</li>
+</ul>
+<h3 id="run-time">Run time</h3>
+<ul>
+<li>1 hr</li>
+</ul>
+<h2 id="step-1-start-kafka-and-zookeeper">Step 1: Start Kafka and ZooKeeper</h2>
+<p>Since we have mentioned that docker are getting used, so let’s jump right into it. We will start the zookeeper using docker</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="ex">docker</span> run -d -it --rm --name zookeeper -p 2181:2181 -p 2888:2888 -p 3888:3888 debezium/zookeeper:1.0</a></code></pre></div>
+<p>To see the logs of the docker container</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1"><span class="ex">docker</span> logs -f zookeeper</a></code></pre></div>
+<p>Similarly, we are going to start kafka in another container</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1"><span class="ex">docker</span> run -d -it --rm --name kafka -p 9092:9092 --link zookeeper:zookeeper debezium/kafka:1.0</a></code></pre></div>
+<p>Notes: <code>-p</code> binds the ports of<code>host:container</code></p>
+<h2 id="step-2-start-a-mysql-database">Step 2: Start a MySQL database</h2>
+<p>Now that we have the Kafka and Zookeeper ready, it’s time for us to start the MySQL database container</p>
+<p>Run the following command and start a docker container with MySQL DB running in it.</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"><span class="ex">docker</span> run -d \</a>
+<a class="sourceLine" id="cb4-2" title="2">-it --rm --name mysql \</a>
+<a class="sourceLine" id="cb4-3" title="3">-p 3306:3306 \</a>
+<a class="sourceLine" id="cb4-4" title="4">-e MYSQL_ROOT_PASSWORD=kafkalabs \</a>
+<a class="sourceLine" id="cb4-5" title="5">-e MYSQL_USER=labuser \</a>
+<a class="sourceLine" id="cb4-6" title="6">-e MYSQL_PASSWORD=lablpw \</a>
+<a class="sourceLine" id="cb4-7" title="7">debezium/example-mysql:1.0</a></code></pre></div>
+<p>Give it some time to start the container properly and you can keep checking the logs and wait for it to get stable with running the socket at port 3306.</p>
+<p>For the logs:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="ex">docker</span> logs -f mysql</a></code></pre></div>
+<p>Note: <code>-e</code>: Environment variables set to start the containers.</p>
+<h2 id="step-3-start-a-mysql-client-for-cli-command-line-interface">Step 3: Start a MySQL client for CLI (Command line interface)</h2>
+<p>If you wish to keep looking at the container logs, then you can start a new termial and use another docker image <code>mysql:5.7</code>, any version less than 5.7 might not work.</p>
+<p>So, open a new terminal and start the container</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="ex">docker</span> run -d \</a>
+<a class="sourceLine" id="cb6-2" title="2">-it --rm --name mysqlclient \</a>
+<a class="sourceLine" id="cb6-3" title="3">--link mysql \</a>
+<a class="sourceLine" id="cb6-4" title="4">--rm mysql:5.7 \</a>
+<a class="sourceLine" id="cb6-5" title="5">sh -c <span class="st">&#39;exec mysql -h&quot;$MYSQL_PORT_3306_TCP_ADDR&quot; \</span></a>
+<a class="sourceLine" id="cb6-6" title="6"><span class="st"> -P&quot;$MYSQL_PORT_3306_TCP_PORT&quot; -uroot \</span></a>
+<a class="sourceLine" id="cb6-7" title="7"><span class="st"> -p&quot;$MYSQL_ENV_MYSQL_ROOT_PASSWORD&quot;&#39;</span></a></code></pre></div>
+<p>So many things are happening here:</p>
+<ul>
+<li><code>link</code> : We are connecting this container with the previous mysql container</li>
+<li><code>sh</code> : we are just executing a shell command to start the mysql command line using the user we created in the previous session</li>
+</ul>
+<p><strong>QUESTION</strong> for you: From where the variable <code>MYSQL_ENV_MYSQL_ROOT_PASSWORD</code> is getting its value? And what other values can we get?</p>
+<p>Now, in the <code>mysql</code> cli, you can try running few commands to see what do we already have in the database:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb7-1" title="1">mysql<span class="op">&gt;</span> <span class="kw">use</span> inventory;</a>
+<a class="sourceLine" id="cb7-2" title="2">mysql<span class="op">&gt;</span> show <span class="kw">tables</span>;</a>
+<a class="sourceLine" id="cb7-3" title="3">mysql<span class="op">&gt;</span> <span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> orders;</a></code></pre></div>
+<h2 id="todo">TODO:</h2>
+<ul>
+<li>Find how many rows each table has.</li>
+<li>Display all the columns of each table.</li>
+</ul>
+<h3 id="optional-how-do-we-have-the-data-in-database">(Optional) How do we have the data in database?</h3>
+<ul>
+<li><p>Checkout the github repo of the docker image which we pulled <a href="https://github.com/debezium/docker-images/tree/master/examples/mysql/1.0">debezium/docker-images</a></p></li>
+<li><p>For brainstorming session - Given <a href="https://github.com/debezium/docker-images/blob/master/examples/mysql/1.0/Dockerfile">such</a> <code>Dockerfile</code> will you be able to setup your own docker image with the database?</p></li>
+<li><p>Take a thorough look in the configuration file of the mysql database in the git repo,</p></li>
+</ul>
+<hr />
+<h2 id="step-4-optional-configure-a-new-mysql-to-use-debezium-connector">Step 4 (Optional): Configure a new MySQL to use Debezium connector</h2>
+<p>Please note that so far we used a docker image that was provided by Debezium and we also looked at the configuration file. But if you are interested in setting up your own docker images then you can follow these instructions.</p>
+<h3 id="mysql-docker-image-from-docker-hub">MySQL docker image from docker-hub</h3>
+<ul>
+<li>Pull docker image from docker hun <code>mysql:5.7</code></li>
+<li>Start the container and follow these insturcutions once you go into the mysql cli</li>
+</ul>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1"><span class="ex">docker</span> run -d -p 3306:3306 --name mysql1 mysql:5.7</a>
+<a class="sourceLine" id="cb8-2" title="2"><span class="ex">docker</span> exec -it mysql1 mysql -uroot -p</a></code></pre></div>
+<p>It will ask for the password, pass the password <strong>mypassword</strong></p>
+<p>Note - <code>The password promptor will not be visible</code></p>
+<h3 id="create-new-user-for-debezium">Create new user for Debezium</h3>
+<ol type="1">
+<li>Creating new user</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb9-1" title="1">mysql<span class="op">&gt;</span> <span class="kw">CREATE</span> <span class="fu">USER</span> <span class="st">&#39;user&#39;</span>@<span class="st">&#39;localhost&#39;</span> <span class="kw">IDENTIFIED</span> <span class="kw">BY</span> <span class="st">&#39;password&#39;</span>;</a></code></pre></div>
+<ol start="2" type="1">
+<li>Grant permissions to that user</li>
+</ol>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb10-1" title="1">mysql<span class="op">&gt;</span> <span class="kw">GRANT</span> <span class="kw">SELECT</span>, RELOAD, SHOW DATABASES, REPLICATION SLAVE, REPLICATION CLIENT <span class="kw">ON</span> <span class="op">*</span>.<span class="op">*</span> <span class="kw">TO</span> <span class="st">&#39;user&#39;</span> <span class="kw">IDENTIFIED</span> <span class="kw">BY</span> <span class="st">&#39;password&#39;</span>;</a></code></pre></div>
+<ol start="3" type="1">
+<li>Finalize the permissions</li>
+</ol>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb11-1" title="1">mysql<span class="op">&gt;</span> <span class="kw">FLUSH</span> <span class="kw">PRIVILEGES</span>;</a></code></pre></div>
+<h3 id="enabling-binary-logging-for-mysql-replication-debezium">Enabling Binary logging for MySQL replication | Debezium</h3>
+<ol type="1">
+<li>Check if the log-bin option is already on or not.</li>
+</ol>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb12-1" title="1">mysql<span class="op">&gt;</span> <span class="kw">SELECT</span> variable_value <span class="kw">as</span> <span class="ot">&quot;BINARY LOGGING STATUS (log-bin) ::&quot;</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="kw">FROM</span> information_schema.global_variables <span class="kw">WHERE</span> varia</a></code></pre></div>
+<p>If it’s off, check the docker run command and a config file and add another volume mapping to it with these configurations</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode ini"><code class="sourceCode ini"><a class="sourceLine" id="cb13-1" title="1"><span class="dt">server-id         </span><span class="ot">=</span><span class="st"> </span><span class="dv">223344</span><span class="st"> </span></a>
+<a class="sourceLine" id="cb13-2" title="2"><span class="dt">log_bin           </span><span class="ot">=</span><span class="st"> mysql-bin </span></a>
+<a class="sourceLine" id="cb13-3" title="3"><span class="dt">binlog_format     </span><span class="ot">=</span><span class="st"> ROW </span></a>
+<a class="sourceLine" id="cb13-4" title="4"><span class="dt">binlog_row_image  </span><span class="ot">=</span><span class="st"> FULL </span></a>
+<a class="sourceLine" id="cb13-5" title="5"><span class="dt">expire_logs_days  </span><span class="ot">=</span><span class="st"> </span><span class="dv">10</span><span class="st"> </span></a></code></pre></div>
+<p>Then, check the configuration again:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb14-1" title="1">mysql<span class="op">&gt;</span> <span class="kw">SELECT</span> variable_value <span class="kw">as</span> <span class="ot">&quot;BINARY LOGGING STATUS (log-bin) ::&quot;</span></a>
+<a class="sourceLine" id="cb14-2" title="2"><span class="kw">FROM</span> information_schema.global_variables <span class="kw">WHERE</span> variable_name<span class="op">=</span><span class="st">&#39;log_bin&#39;</span>;</a></code></pre></div>
+<h3 id="enabling-mysql-global-transaction-identifiers-gti-for-debezium">Enabling MySQL Global Transaction Identifiers (GTI) for Debezium</h3>
+<p>Global transaction identifiers (GTIDs) uniquely identify transactions that occur on a server within a cluster. Though not required for the Debezium MySQL connector, using GTIDs simplifies replication and allows you to more easily confirm if master and slave servers are consistent.</p>
+<ol type="1">
+<li>Enable gtid_mode</li>
+</ol>
+<div class="sourceCode" id="cb15"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb15-1" title="1">mysql<span class="op">&gt;</span> gtid_mode<span class="op">=</span><span class="kw">ON</span></a></code></pre></div>
+<ol start="2" type="1">
+<li>Enable enforce_gtid_consistency:</li>
+</ol>
+<div class="sourceCode" id="cb16"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb16-1" title="1">mysql<span class="op">&gt;</span> enforce_gtid_consistency<span class="op">=</span><span class="kw">ON</span></a></code></pre></div>
+<ol start="3" type="1">
+<li>Confirm the changes</li>
+</ol>
+<div class="sourceCode" id="cb17"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb17-1" title="1">mysql<span class="op">&gt;</span> show <span class="kw">global</span> variables <span class="kw">like</span> <span class="st">&#39;%GTID%&#39;</span>;</a></code></pre></div>
+<h4 id="setting-up-session-timeouts-query-log-for-debezium">Setting up session timeouts &amp; query log for Debezium</h4>
+<div class="sourceCode" id="cb18"><pre class="sourceCode sql"><code class="sourceCode sql"><a class="sourceLine" id="cb18-1" title="1">mysql<span class="op">&gt;</span> interactive_timeout<span class="op">=&lt;</span>duration<span class="op">-</span><span class="kw">in</span><span class="op">-</span>seconds<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb18-2" title="2">mysql<span class="op">&gt;</span> wait_timeout<span class="op">=</span> <span class="op">&lt;</span>duration<span class="op">-</span><span class="kw">in</span><span class="op">-</span>seconds<span class="op">&gt;</span></a>
+<a class="sourceLine" id="cb18-3" title="3"></a>
+<a class="sourceLine" id="cb18-4" title="4">mysql<span class="op">&gt;</span> binlog_rows_query_log_events<span class="op">=</span><span class="kw">ON</span></a></code></pre></div>
+<hr />
+<h2 id="step-5-kafka-connect">Step 5: Kafka Connect</h2>
+<h3 id="start-kafka-connect-in-a-container">Start Kafka Connect in a container</h3>
+<p>It is recommened to run kafka connect on containerized environment</p>
+<p>Assuming you didn’t face any issues so far, now it’s time to run the command mentioned below to start the kafka-container</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb19-1" title="1"><span class="ex">docker</span> run -d -it \</a>
+<a class="sourceLine" id="cb19-2" title="2">--rm --name connect \</a>
+<a class="sourceLine" id="cb19-3" title="3">-p 8083:8083 \</a>
+<a class="sourceLine" id="cb19-4" title="4">-e GROUP_ID=1 \</a>
+<a class="sourceLine" id="cb19-5" title="5">-e CONFIG_STORAGE_TOPIC=my_connect_configs \</a>
+<a class="sourceLine" id="cb19-6" title="6">-e OFFSET_STORAGE_TOPIC=my_connect_offsets \</a>
+<a class="sourceLine" id="cb19-7" title="7">-e STATUS_STORAGE_TOPIC=my_connect_statuses \</a>
+<a class="sourceLine" id="cb19-8" title="8">--link zookeeper:zookeeper \</a>
+<a class="sourceLine" id="cb19-9" title="9">--link kafka:kafka \</a>
+<a class="sourceLine" id="cb19-10" title="10">--link mysql:mysql debezium/connect:1.0</a></code></pre></div>
+<p>Here are the things happening in the above command</p>
+<ul>
+<li><code>link</code>: Connecting <strong>zookeeper, kafka and mysql</strong> container that we setup in the previous steps</li>
+<li><code>p</code>: We are exposing port 8083:8083 to outside</li>
+<li><code>e</code>: GROUP_ID, CONFIG_STORAGE_TOPIC, OFFSET_STORAGE_TOPIC, and STATUS_STORAGE_TOPIC - Setting these environment variables</li>
+</ul>
+<p>You can remove <code>-d</code> from the above command to see what is going on in the container or the other option is to check the logs using <code>docker logs -f &lt;container name&gt;</code></p>
+<h3 id="kafka-connect-rest-api">Kafka Connect REST API</h3>
+<p>We have exposed the kafka-connect service to our host machine at 8083 port. So, to communicate to the service, we can send requests to port 8083 oh our host machine which will forward our request to 8083 port of the container service. So, let’s try that:</p>
+<p>From terminal, request a curl command:</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb20-1" title="1"><span class="ex">curl</span> -H <span class="st">&quot;Accept:application/json&quot;</span> localhost:8083/</a></code></pre></div>
+<p>If you are on Non-linux distro, try:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb21-1" title="1"><span class="ex">curl</span> -H <span class="st">&quot;Accept:application/json&quot;</span> <span class="op">&lt;</span>your ip<span class="op">&gt;</span>:8083/</a></code></pre></div>
+<p>You should receive a JSON response with <code>version</code> of Kafka connect and <code>commit</code> values.</p>
+<p>Now, let’s see the list of connectors available:</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb22-1" title="1"><span class="ex">curl</span> -H <span class="st">&quot;Accept:application/json&quot;</span> localhost:8083/connectors/</a></code></pre></div>
+<p>It should return an empty list <code>[]</code>. In this case, we are good to go as we are able to talk to the connector.</p>
+<p>So, let’s start a connector that will capture the changes from our MSQL database.</p>
+<h3 id="monitoring-mysql-database">Monitoring MySQL Database</h3>
+<p>Since, we have <code>inventory</code> database which we have already talked about why? So, let’s register a connector that will begin the monitoring with MySQL database server’s binlog and generate change events for each row that are dynamically changing (if we do that). Since this is a new connector, when it starts it will start reading from the beginning of the MySQL binlog, which records all of the transactions, including individual row changes and changes to the schemas.</p>
+<p>So for registring a connector, we will run the following curl command: (<strong>PlEASE LOOK CAREFULLY, SOME FEILDS ARE LEFT BLANK, YOU HAVE TO FILL THEM</strong>)</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb23-1" title="1">$ <span class="ex">curl</span> -i -X POST -H <span class="st">&quot;Accept:application/json&quot;</span> -H \</a>
+<a class="sourceLine" id="cb23-2" title="2"><span class="st">&quot;Content-Type:application/json&quot;</span> \</a>
+<a class="sourceLine" id="cb23-3" title="3">localhost:8083/connectors/ \</a>
+<a class="sourceLine" id="cb23-4" title="4">-d <span class="st">&#39;{ &quot;name&quot;: &quot;inventory-connector&quot;, \</span></a>
+<a class="sourceLine" id="cb23-5" title="5"><span class="st">&quot;config&quot;: { \</span></a>
+<a class="sourceLine" id="cb23-6" title="6"><span class="st">    &quot;connector.class&quot;: &quot;io.debezium.connectorsctor.mysql.MySqlConnector&quot;, \</span></a>
+<a class="sourceLine" id="cb23-7" title="7"><span class="st">    &quot;tasks.max&quot;: &quot;1&quot;, \</span></a>
+<a class="sourceLine" id="cb23-8" title="8"><span class="st">    &quot;database.hostname&quot;: &quot;mysql&quot;, \</span></a>
+<a class="sourceLine" id="cb23-9" title="9"><span class="st">    &quot;database.port&quot;: &quot;3306&quot;, \</span></a>
+<a class="sourceLine" id="cb23-10" title="10"><span class="st">    &quot;database.user&quot;: &quot;______&quot;, \</span></a>
+<a class="sourceLine" id="cb23-11" title="11"><span class="st">    &quot;database.password&quot;: &quot;______&quot;,\</span></a>
+<a class="sourceLine" id="cb23-12" title="12"><span class="st">    &quot;database.server.id&quot;: &quot;184054&quot;, \</span></a>
+<a class="sourceLine" id="cb23-13" title="13"><span class="st">    &quot;database.server.name&quot;: &quot;dbserver1&quot;, \</span></a>
+<a class="sourceLine" id="cb23-14" title="14"><span class="st">    &quot;database.whitelist&quot;: &quot;inventory&quot;, \</span></a>
+<a class="sourceLine" id="cb23-15" title="15"><span class="st">    &quot;database.history.kafka.bootstrap.servers&quot;: &quot;kafka:9092&quot;, \</span></a>
+<a class="sourceLine" id="cb23-16" title="16"><span class="st">    &quot;database.history.kafka.topic&quot;: &quot;dbhistory.inventory&quot; \</span></a>
+<a class="sourceLine" id="cb23-17" title="17"><span class="st">} }&#39;</span></a></code></pre></div>
+<p>So, we did the POST Request against /connectors. Now, you can try the previous curl request to check the list of connectors again.</p>
+<p>If you still have the kafka-connector service’s log open in the terminal (if not, then you can check the logs) then you can observe, how each of the row of data is getting fetched by the connector.</p>
+<h4 id="observations-and-discussions-so-far">Observations and Discussions So Far</h4>
+<p>In the change events, you will observe the binlogs and the topics to which it is storing the information is :</p>
+<p>Each topic name starts with <strong>dbserver1</strong> which we gave to the connector.</p>
+<ul>
+<li>dbserver1</li>
+<li>dbserver1.inventory.products</li>
+<li>dbserver1.inventory.products_on_hand</li>
+<li>dbserver1.inventory.customers</li>
+<li>dbserver1.inventory.orders</li>
+</ul>
+<p>The first is our schema change topic to which all of the DDL statements are written. The remaining four topics are used to capture the change events for each of our four tables, and their topic names include the database name (e.g., inventory) and the table name.</p>
+<h2 id="step-6-observe-who-changes-are-captured">Step 6: Observe who changes are captured</h2>
+<p>So, here are the things we need</p>
+<ul>
+<li>Keep the logs of the kafkaconnector running in a terminal using:</li>
+</ul>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb24-1" title="1"><span class="ex">docker</span> logs -f <span class="op">&lt;</span>kafka connector container name<span class="op">&gt;</span></a></code></pre></div>
+<ul>
+<li>Restart a new kafka container which is attached with a kafka topic</li>
+</ul>
+<div class="sourceCode" id="cb25"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb25-1" title="1">$ <span class="ex">docker</span> run -it \</a>
+<a class="sourceLine" id="cb25-2" title="2">--name watcher \</a>
+<a class="sourceLine" id="cb25-3" title="3">--rm --link zookeeper:zookeeper \</a>
+<a class="sourceLine" id="cb25-4" title="4">--link kafka:kafka debezium/kafka:1.0 \</a>
+<a class="sourceLine" id="cb25-5" title="5">watch-topic -a -k dbserver1.inventory.customers</a></code></pre></div>
+<p>So, what are the things happening here: - <code>a</code>: Telling the watch-topic to show us all events since the beginning - <code>k</code>: Log should output the event’s key.</p>
+<p>TODO: Observe the changes in the log after removing <code>a</code> or <code>k</code> from the above bask command.</p>
+<p>Now that we are observing the events while you make any update in the <code>customers</code> table, that we leave up to you.</p>
+<p><strong>QUESTION:</strong> What are the ALTER/UPDATE/DELETE commands you tried and how was the changes getting logged by the containers.</p>
+<h2 id="congratulations-you-completed-this-lab.">Congratulations! You completed this lab.</h2>

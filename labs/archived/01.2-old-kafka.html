@@ -1,0 +1,62 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-1.2-run-kafka">Lab 1.2 : Run Kafka</h1>
+<h3 id="note">Note</h3>
+<p><strong>If you are using the Docker training VM, Kafka is already installed. You can skip to Step-4</strong><br />
+<strong>The setup instructions are for your reference</strong></p>
+<h3 id="overview">Overview</h3>
+<p>Install and run Kafka</p>
+<h3 id="depends-on">Depends On</h3>
+<p>None</p>
+<h3 id="run-time">Run time</h3>
+<p>10 mins</p>
+<h2 id="step-1-download-and-unpack-kafka">Step 1 : Download and Unpack Kafka</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    $   <span class="bu">cd</span>   ~/apps</a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3">    $   <span class="fu">wget</span> https://s3.amazonaws.com/elephantscale-public/downloads/kafka_2.11-2.2.0.tgz</a>
+<a class="sourceLine" id="cb1-4" title="4"></a>
+<a class="sourceLine" id="cb1-5" title="5">    $   <span class="fu">tar</span> xvf kafka_2.11-2.2.0.tgz</a>
+<a class="sourceLine" id="cb1-6" title="6"></a>
+<a class="sourceLine" id="cb1-7" title="7">    $   <span class="fu">mv</span> kafka_2.11-2.2.0  kafka</a></code></pre></div>
+<h2 id="step-2-start-kafka">Step 2 : Start Kafka</h2>
+<p>Enable deleting the topics</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">  $   <span class="bu">echo</span> -e <span class="st">&quot;\n\ndelete.topic.enable=true \n&quot;</span> <span class="op">&gt;&gt;</span> ~/apps/kafka/config/server.properties</a></code></pre></div>
+<p>Start Kafka</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">    $   <span class="va">JMX_PORT=</span>9999  <span class="ex">~/apps/kafka/bin/kafka-server-start.sh</span> -daemon \</a>
+<a class="sourceLine" id="cb3-2" title="2">        ~/apps/kafka/config/server.properties</a></code></pre></div>
+<p>We are setting the optional JMX port so we can get metrics easily.</p>
+<p>Try JPS command to see if Kafka is running</p>
+<pre><code>    $  jps</code></pre>
+<p>Output may look like this. We have Zookeeper and Kafka running</p>
+<pre class="console"><code>4737 QuorumPeerMain
+5361 Kafka
+5075 main
+5092 main
+5418 Jps</code></pre>
+<h2 id="step-3-starting-kafka-manager-ui">Step 3 : Starting Kafka Manager UI</h2>
+<p>We are using the excellent <a href="https://github.com/yahoo/kafka-manager">Kafka Manager UI (by Yahoo)</a>. We have already packaged the application that is ready to use.</p>
+<pre><code>    $    cd  ~/apps/kafka-manager
+
+    $    nohup bin/kafka-manager  &amp;
+
+    $    cd</code></pre>
+<h2 id="step-4---accessing-kafka-manager-ui">Step 4 - Accessing Kafka Manager UI</h2>
+<p>Go to url : http://your_IP:9000 in your browser.</p>
+<p>You may see a UI like this.</p>
+<p><img src="../assets/images/1.2a.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<p>Access the ‘local’ cluster already defined. If one is not defined, you can define one as follows.</p>
+<p><img src="../assets/images/1.2b.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<p>Explore the UI</p>
+<p><img src="../assets/images/1.2c.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<h2 id="step-4-kafka-zookeeper">Step 4 : Kafka &amp; Zookeeper</h2>
+<p>Inspect ZK config</p>
+<h3 id="option-1-zk-web">Option 1 : ZK-web</h3>
+<p>Go to ZK web dashboard (http://ip_address:8081) and refresh.</p>
+<p><img src="../assets/images/1.2d.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<h3 id="option-2-zk-cli">Option 2 : ZK CLI</h3>
+<pre><code>    $   ~/apps/zookeeper/bin/zkCli.sh  -server  localhost:2181
+
+    &gt;   ls   /
+    &gt;   ls   /brokers
+    &gt;   ls   /brokers/ids
+    &gt;   ls   /brokers/ids/0</code></pre>

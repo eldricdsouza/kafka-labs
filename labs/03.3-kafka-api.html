@@ -1,0 +1,121 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-3.3-working-with-kafka-api">Lab 3.3 : Working With Kafka API</h1>
+<h2 id="instructor">Instructor</h2>
+<p><strong>Please do the lab together with students, step by step</strong></p>
+<h2 id="overview">Overview</h2>
+<p>Use Producer / Consumer API</p>
+<h2 id="depends-on">Depends On</h2>
+<p>None</p>
+<h2 id="run-time">Run time</h2>
+<p>40 mins</p>
+<h2 id="step-1-create-a-clickstream-topic">Step 1 : Create a ‘clickstream’ topic</h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    $   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span>  --bootstrap-server localhost:9092  --create \</a>
+<a class="sourceLine" id="cb1-2" title="2">        --topic clickstream --replication-factor 1  --partitions 2</a></code></pre></div>
+<h2 id="step-2-open-a-console-consumer">Step 2 : Open a console consumer</h2>
+<p>In a terminal</p>
+<pre><code>    $  ~/apps/kafka/bin/kafka-console-consumer.sh \
+        --bootstrap-server localhost:9092 \
+        --property print.key=true --property key.separator=&quot;:&quot; \
+        --topic clickstream</code></pre>
+<p>or if you have Kafkacat</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t clickstream -f <span class="st">&#39;Partition %t[%p], offset: %o, key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<h2 id="step-3-producer">Step 3 : Producer</h2>
+<ul>
+<li>Inspect file : <code>src/main/java/x/lab03_api_intro/ClickstreamProducer.java</code><br />
+</li>
+<li>Fix all TODO items, using Eclipse (or any other editor).</li>
+</ul>
+<h2 id="step-4-run-the-producer">Step 4 : Run the producer</h2>
+<p>In Eclipse,</p>
+<ul>
+<li>Right click on ‘src/main/java/x/lab03_api_intro/ClickstreamProducer.java’</li>
+<li>Run as ‘Java Application’</li>
+</ul>
+<p>In Eclipse console, you should see output as follows:</p>
+<pre class="console"><code>Producer starting.... : ClickstreamProducer (topic=clickstream, maxMessages=10, freq=1000 ms)
+
+sending : ProducerRecord(topic=clickstream, partition=null, headers=RecordHeaders(headers = [], isReadOnly = false), key=facebook.com, value={&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}, timestamp=null)
+
+
+sending : ProducerRecord(topic=clickstream, partition=null, headers=RecordHeaders(headers = [], isReadOnly = false), key=foxnews.com, value={&quot;timestamp&quot;:1451635200010,&quot;session&quot;:&quot;session_224&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:17,&quot;user&quot;:&quot;user_89&quot;,&quot;campaign&quot;:&quot;campaign_4&quot;,&quot;ip&quot;:&quot;ip_57&quot;,&quot;action&quot;:&quot;viewed&quot;}, timestamp=null)</code></pre>
+<h2 id="step-5-monitor-kafka-console-consumer">Step 5 : Monitor Kafka console consumer</h2>
+<p>The messages should show up in Kafka console terminal !<br />
+Yay !!</p>
+<p><strong>Question: Are the messages coming in order? (check the key) Why or why not?</strong></p>
+<p><strong>Can you make the messages come ‘out of order’?<br />
+Hint : Reduce the time interval between messages on producer side :-)</strong></p>
+<h2 id="step-6-quick-experiment-on-send-modes">Step-6: Quick experiment on send modes</h2>
+<p>In our producer we are sending our records <strong>without</strong> waiting for response</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode java"><code class="sourceCode java"><a class="sourceLine" id="cb5-1" title="1">producer.<span class="fu">send</span>(record)</a></code></pre></div>
+<p>Take a note at the average time taken to send a record. Should be around 0.1 - 0.5 ms range.</p>
+<p>Now update the code to wait for the response from Kafka broker, as follows</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode java"><code class="sourceCode java"><a class="sourceLine" id="cb6-1" title="1">producer.<span class="fu">send</span>(record).<span class="fu">get</span>()</a></code></pre></div>
+<p><strong>Action: Run the code again, and note the average time to send each record. How much difference do you notice?</strong></p>
+<h2 id="step-7-consumer">Step 7 : Consumer</h2>
+<ul>
+<li>Edit file <code>src/main/java/x/lab03_api_intro/ClickstreamConsumer.java</code><br />
+</li>
+<li>Fix all TODO items, using Eclipse (or any other editor).</li>
+</ul>
+<h2 id="step-8-run-consumer-and-producer-from-eclipse">Step 8 : Run Consumer and Producer from Eclipse</h2>
+<ul>
+<li>Right click on <code>src/main/java/x/lab03_api_intro/ClickstreamConsumer.java</code></li>
+<li>Run as ‘Java Application’</li>
+<li>Right click on ‘src/main/java/x/lab03_api_intro/ClickstreamProducer.java’</li>
+<li>Run as ‘Java Application’</li>
+</ul>
+<p><strong>=&gt; In Eclipse, monitor output from two of these programs</strong><br />
+Hint : you may need to switch to Debug view</p>
+<p><strong>=&gt; Also what is happening in Kafka console consumer?</strong></p>
+<h2 id="step-9-run-multiple-consumers">Step 9 : Run multiple consumers</h2>
+<ul>
+<li>Run <code>src/main/java/x/lab03_api_intro/ClickstreamConsumer.java</code></li>
+<li>Again run <code>src/main/java/x/lab03_api_intro/ClickstreamConsumer.java</code></li>
+<li>Verify two consumer apps are running in Eclipse</li>
+<li>Run <code>src/main/java/x/lab03_api_intro/ClickstreamProducer.java</code></li>
+<li>Verify the messages are split between two consumers</li>
+</ul>
+<p><strong>Run three consumers and see which ones are getting data. Can you explain the behavior?</strong></p>
+<h2 id="step-10-inspect-kafka-manager">Step-10: Inspect Kafka Manager</h2>
+<p>Inspect the <strong>consumer</strong> tab in Kafka Manager. Here we can see various consumer groups and what they are reading.</p>
+<p>Note the following:</p>
+<ul>
+<li>Consumer groups</li>
+<li>What topics they are reading</li>
+<li>Producer offset, consumer offset and lag</li>
+</ul>
+<p><img src="../assets/images/3.3a.png" style="border: 5px solid grey ; width:90%;" /></p>
+<p><img src="../assets/images/3.3b.png" style="border: 5px solid grey ; width:90%;" /></p>
+<h2 id="step-11-run-the-code-in-terminal">Step-11: Run the code in terminal</h2>
+<p>So far we have been using Eclipse. Let’s try to compile and run the code with maven.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">    $   <span class="bu">cd</span>   ~/dev/kafka-labs</a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3">    $   <span class="ex">mvn</span>  clean package  -DskipTests</a></code></pre></div>
+<p>Inspect the <code>target</code> directory. You will see 2 jars.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$   <span class="fu">ls</span> -lh  target</a></code></pre></div>
+<pre class="console"><code>-rw-r--r-- 1 ubuntu ubuntu  68M Nov 23 13:38 kafka-labs-2.0-jar-with-dependencies.jar
+-rw-r--r-- 1 ubuntu ubuntu  67K Nov 23 13:38 kafka-labs-2.0.jar</code></pre>
+<ul>
+<li><code>kafka-labs-2.0.jar</code> only has our classes</li>
+<li><code>kafka-labs-2.0-jar-with-dependencies.jar</code> has our code and all dependencies included. This is a convenient way to run our application withuot having to worry about dependencies.</li>
+</ul>
+<p>You can checkout the classes included in a jar file as follows:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># check the lite version</span></a>
+<a class="sourceLine" id="cb10-2" title="2">$   <span class="ex">jar</span> tf target/kafka-labs-2.0.jar   <span class="kw">|</span> <span class="fu">less</span></a>
+<a class="sourceLine" id="cb10-3" title="3"><span class="co"># hit &#39;q&#39; to exit paging</span></a>
+<a class="sourceLine" id="cb10-4" title="4"></a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="co"># check the mega version</span></a>
+<a class="sourceLine" id="cb10-6" title="6">$   <span class="ex">jar</span> tf target/kafka-labs-2.0-jar-with-dependencies.jar <span class="kw">|</span> <span class="fu">less</span></a>
+<a class="sourceLine" id="cb10-7" title="7"><span class="co"># hit &#39;q&#39; to exit paging</span></a></code></pre></div>
+<p>Try this to start the consumer</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1">$   <span class="ex">java</span> -cp target/kafka-labs-2.0-jar-with-dependencies.jar   x.lab03_api_intro.ClickstreamConsumer</a>
+<a class="sourceLine" id="cb11-2" title="2"></a>
+<a class="sourceLine" id="cb11-3" title="3"><span class="co"># another option is running via maven</span></a>
+<a class="sourceLine" id="cb11-4" title="4">$   <span class="ex">mvn</span> exec:java  -Dexec.mainClass=x.lab03_api_intro.ClickstreamConsumer</a></code></pre></div>
+<p>Open another terminal and start the producer</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1">$    <span class="ex">java</span> -cp target/kafka-labs-2.0-jar-with-dependencies.jar    x.lab03_api_intro.ClickstreamProducer</a>
+<a class="sourceLine" id="cb12-2" title="2"></a>
+<a class="sourceLine" id="cb12-3" title="3"><span class="co"># or using maven</span></a>
+<a class="sourceLine" id="cb12-4" title="4">$  <span class="ex">mvn</span> exec:java  -Dexec.mainClass=x.lab03_api_intro.ClickstreamProducer</a></code></pre></div>
+<p>Watch the consoles of both producer and consumer</p>

@@ -1,0 +1,26 @@
+<h1 id="setting-up-a-distributed-kafka-cluster">Setting up a Distributed Kafka Cluster</h1>
+<p>ssh into server1 - install zookeper - start zookeeper</p>
+<ul>
+<li>untar kafka</li>
+<li><p>edit ~/apps/kafka/conf/server.properties broker.id=0 # use internal ip for zk zookeeper.connect=ZK_SERVER_INTERNAL:2181</p></li>
+<li><p>start kafka</p></li>
+<li>setup kafka manager</li>
+<li>register kafka
+<ul>
+<li>make sure zk server is set to : ZK_SERVER_INTERNAL:2181</li>
+</ul></li>
+<li><p>copy kafka to server2 scp -r ~/kafka server2:</p></li>
+<li>ssh into server2
+<ul>
+<li><p>edit ~/apps/kafka/conf/server.properties broker.id=1</p></li>
+<li><p>start kafka on server2</p></li>
+<li><p>now look at kafka manager, you should see server2 joined and 2 brokers</p></li>
+</ul></li>
+<li><p>copy kafka to server3 scp -r ~/kafka server3:</p></li>
+<li>ssh into server3
+<ul>
+<li><p>edit ~/apps/kafka/conf/server.properties broker.id=2</p></li>
+<li><p>start kafka on server3</p></li>
+<li><p>now look at kafka manager, you should see server3 joined and 3 brokers</p></li>
+</ul></li>
+</ul>

@@ -1,0 +1,69 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-7.4-kafka-streaming---map">Lab 7.4: Kafka Streaming - Map</h1>
+<h2 id="overview">Overview</h2>
+<p>Apply <code>map</code> transformation for KStreams</p>
+<h2 id="depends-on">Depends On</h2>
+<p><a href="07.1-streaming-intro.html">7.1 streaming intro</a></p>
+<h2 id="run-time">Run time</h2>
+<p>20 mins</p>
+<h2 id="step-1-streaming-consumer-3">Step 1 : Streaming Consumer 3</h2>
+<p>File : <code>src/main/java/x/lab07_streaming/StreamingConsumer3_Map.java</code></p>
+<p>This consumer will read a KafkaStream and map the incoming record into key value pair with action.</p>
+<p>Example 1:</p>
+<pre><code>Incoming :
+{&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+Output:
+(&quot;clicked&quot;, 1)</code></pre>
+<p>Example 2:</p>
+<pre><code>Input :
+{&quot;timestamp&quot;:1451635200010,&quot;session&quot;:&quot;session_224&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:17,&quot;user&quot;:&quot;user_89&quot;,&quot;campaign&quot;:&quot;campaign_4&quot;,&quot;ip&quot;:&quot;ip_57&quot;,&quot;action&quot;:&quot;viewed&quot;}
+
+Output:
+(&quot;viewed&quot;, 1)</code></pre>
+<p><strong>=&gt; Inspect the file and fix the TODO items.</strong></p>
+<p><strong>Run the <code>lab07_streaming/StreamingConsumer3_Map</code> in Eclipse</strong></p>
+<h2 id="step-2-run-producer">Step 2: Run Producer</h2>
+<p><strong>Run the <code>utils.ClickStreamProducer</code> in Eclipse</strong></p>
+<p>Expected output:</p>
+<p>Notice <code>KStream-Action</code> will only have (action,1)</p>
+<pre class="console"><code>
+[INFO ] 2018-07-22 14:21:27.487 [main] StreamingConsumer4_Map:main(81) - kstreams starting on clickstream
+
+[KSTREAM-SOURCE-0000000000]: facebook.com, {&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.649 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(62) - map() : got : {&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.649 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(66) - map() : returning : KeyValue(clicked, 1)
+
+[KSTREAM-MAP-0000000002]: clicked, 1
+----
+
+[KSTREAM-SOURCE-0000000000]: cnn.com, {&quot;timestamp&quot;:1451635200020,&quot;session&quot;:&quot;session_66&quot;,&quot;domain&quot;:&quot;cnn.com&quot;,&quot;cost&quot;:31,&quot;user&quot;:&quot;user_29&quot;,&quot;campaign&quot;:&quot;campaign_3&quot;,&quot;ip&quot;:&quot;ip_49&quot;,&quot;action&quot;:&quot;blocked&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.650 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(62) - map() : got : {&quot;timestamp&quot;:1451635200020,&quot;session&quot;:&quot;session_66&quot;,&quot;domain&quot;:&quot;cnn.com&quot;,&quot;cost&quot;:31,&quot;user&quot;:&quot;user_29&quot;,&quot;campaign&quot;:&quot;campaign_3&quot;,&quot;ip&quot;:&quot;ip_49&quot;,&quot;action&quot;:&quot;blocked&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.650 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(66) - map() : returning : KeyValue(blocked, 1)
+
+[KSTREAM-MAP-0000000002]: blocked, 1
+----
+
+[KSTREAM-SOURCE-0000000000]: foxnews.com, {&quot;timestamp&quot;:1451635200010,&quot;session&quot;:&quot;session_224&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:17,&quot;user&quot;:&quot;user_89&quot;,&quot;campaign&quot;:&quot;campaign_4&quot;,&quot;ip&quot;:&quot;ip_57&quot;,&quot;action&quot;:&quot;viewed&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.651 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(62) - map() : got : {&quot;timestamp&quot;:1451635200010,&quot;session&quot;:&quot;session_224&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:17,&quot;user&quot;:&quot;user_89&quot;,&quot;campaign&quot;:&quot;campaign_4&quot;,&quot;ip&quot;:&quot;ip_57&quot;,&quot;action&quot;:&quot;viewed&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.651 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(66) - map() : returning : KeyValue(viewed, 1)
+
+[KSTREAM-MAP-0000000002]: viewed, 1
+----
+
+[KSTREAM-SOURCE-0000000000]: google.com, {&quot;timestamp&quot;:1451635200025,&quot;session&quot;:&quot;session_29&quot;,&quot;domain&quot;:&quot;google.com&quot;,&quot;cost&quot;:16,&quot;user&quot;:&quot;user_1&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_74&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.651 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(62) - map() : got : {&quot;timestamp&quot;:1451635200025,&quot;session&quot;:&quot;session_29&quot;,&quot;domain&quot;:&quot;google.com&quot;,&quot;cost&quot;:16,&quot;user&quot;:&quot;user_1&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_74&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[DEBUG] 2018-07-22 14:21:27.651 [kafka-streaming-consumer3-cc3c7211-fb5f-4b99-93c5-daf403beb1b5-StreamThread-1] StreamingConsumer4_Map:apply(66) - map() : returning : KeyValue(clicked, 1)
+
+[KSTREAM-MAP-0000000002]: clicked, 1
+----
+</code></pre>

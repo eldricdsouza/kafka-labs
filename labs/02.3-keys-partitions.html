@@ -1,0 +1,60 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-2.3-producing-with-keys">Lab 2.3: Producing with Keys</h1>
+<h2 id="overview">Overview</h2>
+<p>Understanding key mappings to partitions</p>
+<h2 id="run-time">Run time</h2>
+<p>10 mins</p>
+<h2 id="step-1-create-topic-kv">Step-1: Create Topic <code>kv</code></h2>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span> --bootstrap-server localhost:9092 \</a>
+<a class="sourceLine" id="cb1-2" title="2">    --create --topic kv \</a>
+<a class="sourceLine" id="cb1-3" title="3">    --replication-factor 1 --partitions 10</a></code></pre></div>
+<h2 id="step-2-listen-on-topic">Step-2: Listen on topic</h2>
+<p>We will use Kafkacat on terminal-1</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="ex">kafkacat</span> -q -C -b localhost:9092 -t kv -f <span class="st">&#39;Partition %t[%p], offset: %o, key: %k, value: %s\n&#39;</span></a></code></pre></div>
+<h2 id="step-3-produce-some-key-value-pairs">Step-3: Produce Some key-value pairs</h2>
+<p>We will use kafkacat on terminal-2</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">kafkacat</span> -P -b localhost:9092 -t kv -K :</a></code></pre></div>
+<p>And paste the following values on kcat producer terminal-2</p>
+<pre class="text"><code>A:a1
+B:b1
+A:a2
+C:c1
+B:b2
+C:c2
+D:d1
+D:d2
+E:e1
+F:f1
+G:g1
+F:f2
+A:a3</code></pre>
+<h2 id="step-4-observe-the-consumer-output">Step-4: Observe the Consumer Output</h2>
+<p>A sample output from consumer terminal-1 may look like this:</p>
+<pre class="console"><code>Partition kv[2], offset: 2, key: D, value: d1
+Partition kv[2], offset: 3, key: D, value: d2
+Partition kv[2], offset: 4, key: F, value: f1
+Partition kv[2], offset: 5, key: F, value: f2
+Partition kv[3], offset: 8, key: B, value: b1
+Partition kv[3], offset: 9, key: C, value: c1
+Partition kv[3], offset: 10, key: B, value: b2
+Partition kv[3], offset: 11, key: C, value: c2
+Partition kv[5], offset: 6, key: A, value: a1
+Partition kv[5], offset: 7, key: A, value: a2
+Partition kv[8], offset: 1, key: E, value: e1
+Partition kv[8], offset: 2, key: G, value: g1
+Partition kv[5], offset: 8, key: A, value: a3</code></pre>
+<h3 id="a-few-things-to-note">A few things to note:</h3>
+<p><strong>Inspect partition for key <code>A</code>. It will always be the same (here it is kv[5]; yours might be different partition number)</strong></p>
+<p><strong>You can see one key will always map to ONE partition</strong></p>
+<p><strong>But you will also see that more than one key can map to same partition. Here keys <code>D</code> and <code>F</code> are mapping to partition 2</strong></p>
+<h2 id="step-5-try-sending-in-more-data">Step-5: Try Sending in More Data</h2>
+<p>Go and type in some data in key-value format, like this. Feel free to improvise.</p>
+<p><strong>Observe how the keys are mapping to which partitions</strong></p>
+<pre class="text"><code>customer-1:hi
+customer-2:hello
+customer-1:bye
+customer-2:ciao</code></pre>
+<p>and some random text</p>
+<pre class="text"><code>zzz:fjsa
+yyy:kdfja</code></pre>

@@ -1,0 +1,193 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-11.1-spark-structured-streaming-with-kafka">Lab 11.1: Spark Structured Streaming with Kafka</h1>
+<h3 id="overview">Overview</h3>
+<p>Use Spark to process data in Kafka. This will be batch processing.</p>
+<h3 id="run-time">Run time</h3>
+<p>40 mins</p>
+<h2 id="step-1-inspect-spark-services">Step-1: Inspect Spark Services</h2>
+<p>Spark service should be running. Inspect it by running <code>jps</code>. You will see a <code>master</code> and <code>worker</code> process.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">jps</span></a></code></pre></div>
+<p>output:</p>
+<pre class="console"><code>...
+.... master
+.... worker</code></pre>
+<h2 id="step-2-start-pyspark">Step-2: Start PySpark</h2>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">~/apps/spark/bin/pyspark</span></a></code></pre></div>
+<p>In the Spark shell, try these commands</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb4-1" title="1"><span class="op">&gt;</span> f <span class="op">=</span> spark.read.text(<span class="st">&#39;/etc/hosts&#39;</span>)</a>
+<a class="sourceLine" id="cb4-2" title="2"><span class="op">&gt;</span> f.count()</a>
+<a class="sourceLine" id="cb4-3" title="3"><span class="op">&gt;</span> f.show()</a>
+<a class="sourceLine" id="cb4-4" title="4"><span class="op">&gt;</span> exit()</a></code></pre></div>
+<p>You might see output like this:</p>
+<pre class="console"><code>+--------------------+
+|               value|
++--------------------+
+| 127.0.0.1     localhost|
+|::1    localhost ip6...|
+|fe00::0        ip6-localnet|
+|ff00::0        ip6-mcast...|
+|ff02::1        ip6-allnodes|
+|ff02::2        ip6-allro...|
+|10.10.0.2      2282d19...|
++--------------------+</code></pre>
+<h2 id="step-3-create-clickstream-topic">Step-3: Create Clickstream Topic</h2>
+<p>If you don’t have the topic, create it as follows</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span>  --bootstrap-server localhost:9092   \</a>
+<a class="sourceLine" id="cb6-2" title="2">    --create --topic test --replication-factor 1  --partitions 10</a></code></pre></div>
+<h2 id="step-4-install-kafka-python-library">Step-4: Install Kafka Python Library</h2>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$   <span class="ex">pip</span> install confluent_kafka</a></code></pre></div>
+<h2 id="step-5-generate-clickstream-data">Step-5: Generate Clickstream data</h2>
+<p>Open a terminal and run the python producer:</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$   <span class="bu">cd</span>  ~/kafka-labs/python</a>
+<a class="sourceLine" id="cb8-2" title="2"></a>
+<a class="sourceLine" id="cb8-3" title="3">$   <span class="ex">python</span> producer-clickstream.py</a></code></pre></div>
+<p>This will populate clickstream topic</p>
+<h2 id="step-6-inspect-spark-consumer-code">Step-6: Inspect Spark Consumer Code</h2>
+<p>Inspect file: <code>python/spark-consumer-batch.py</code></p>
+<p>We will work through TODO items in this file</p>
+<h2 id="step-7-run-spark-consumer">Step-7: Run Spark Consumer</h2>
+<p>Open a terminal and execute these commands:</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1"></a>
+<a class="sourceLine" id="cb9-2" title="2">$   <span class="bu">cd</span>  ~/kafka-labs/python</a>
+<a class="sourceLine" id="cb9-3" title="3"></a>
+<a class="sourceLine" id="cb9-4" title="4">$  <span class="ex">~/apps/spark/bin/spark-submit</span>  --master local[2] \</a>
+<a class="sourceLine" id="cb9-5" title="5">    --driver-class-path .  \</a>
+<a class="sourceLine" id="cb9-6" title="6">    --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1 \</a>
+<a class="sourceLine" id="cb9-7" title="7">    spark-consumer-batch.py</a></code></pre></div>
+<p>This will initialize Spark session and connect to Kafka. You will output like following</p>
+<pre class="console"><code>root
+ |-- key: string (nullable = true)
+ |-- value: string (nullable = true)
+ |-- topic: string (nullable = true)
+ |-- partition: integer (nullable = true)
+ |-- offset: long (nullable = true)
+ |-- timestamp: timestamp (nullable = true)</code></pre>
+<p><strong>ACTION: Observe how Spark reads from Kafka and the data types</strong></p>
+<h3 id="troubleshoting-tips">Troubleshoting Tips</h3>
+<p>I have noticed in some instances, downloading dependencies will fail. If that happens, try this:</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># clean up ivy caches</span></a>
+<a class="sourceLine" id="cb11-2" title="2">$   <span class="fu">rm</span> -rf    ~/.ivy2/cache   ~/.ivy2/jars</a>
+<a class="sourceLine" id="cb11-3" title="3"></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="co"># If the above doesn&#39;t work, try cleaning up local mvn repository</span></a>
+<a class="sourceLine" id="cb11-5" title="5"><span class="co"># $   rm -rf  ~/.m2/repository</span></a></code></pre></div>
+<p>And then re-run spark application.</p>
+<p>References</p>
+<ul>
+<li><a href="https://github.com/databricks/spark-deep-learning/issues/190#issuecomment-479999455">issue #190</a></li>
+</ul>
+<h2 id="step-8-todo-1---go-through-all-kafka-data">Step-8: TODO-1 - Go through all Kafka Data</h2>
+<p>Here is code process entire Kafka data</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># code for </span><span class="al">TODO</span><span class="co">-1</span></a>
+<a class="sourceLine" id="cb12-2" title="2"><span class="bu">print</span> (<span class="st">&quot;total count: &quot;</span>, df.count())</a>
+<a class="sourceLine" id="cb12-3" title="3">df.show()</a></code></pre></div>
+<p><strong>ACTION: Fill this in for TODO-1 placehold</strong></p>
+<p><strong>ACTION: Run the code again (See Step-4 for run command)</strong></p>
+<p><strong>ACTION: Observe the output. You may see output as follows:</strong></p>
+<pre class="console"><code>+------------+--------------------+-----------+---------+------+--------------------+
+|         key|               value|      topic|partition|offset|           timestamp|
++------------+--------------------+-----------+---------+------+--------------------+
+|facebook.com|{&quot;timestamp&quot;: 164...|clickstream|        9|  1988|2022-01-22 04:37:...|
+|facebook.com|{&quot;timestamp&quot;: 164...|clickstream|        9|  1989|2022-01-22 04:37:...|
+|facebook.com|{&quot;timestamp&quot;: 164...|clickstream|        9|  1990|2022-01-22 04:37:...|
++------------+--------------------+-----------+---------+------+--------------------+</code></pre>
+<h2 id="step-9-todo-2---extract-kafka-data-into-dataframes">Step-9: TODO-2 - Extract Kafka Data into Dataframes</h2>
+<p>Now let’s extract JSON data into Spark dataframe, so we can process it easily.</p>
+<p>Use the code below</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb14-1" title="1"><span class="co"># code for </span><span class="al">TODO</span><span class="co">-2</span></a>
+<a class="sourceLine" id="cb14-2" title="2"></a>
+<a class="sourceLine" id="cb14-3" title="3"><span class="co"># first we need a schema</span></a>
+<a class="sourceLine" id="cb14-4" title="4">schema <span class="op">=</span> StructType(</a>
+<a class="sourceLine" id="cb14-5" title="5">    [</a>
+<a class="sourceLine" id="cb14-6" title="6">        StructField(<span class="st">&#39;timestamp&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb14-7" title="7">        StructField(<span class="st">&#39;ip&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb14-8" title="8">        StructField(<span class="st">&#39;user&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb14-9" title="9">        StructField(<span class="st">&#39;action&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb14-10" title="10">        StructField(<span class="st">&#39;domain&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb14-11" title="11">        StructField(<span class="st">&#39;campaign&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb14-12" title="12">        StructField(<span class="st">&#39;cost&#39;</span>, IntegerType(), <span class="va">True</span>)</a>
+<a class="sourceLine" id="cb14-13" title="13">    ]</a>
+<a class="sourceLine" id="cb14-14" title="14">)</a>
+<a class="sourceLine" id="cb14-15" title="15"></a>
+<a class="sourceLine" id="cb14-16" title="16"><span class="co"># extract value from JSON string and populate into another df</span></a>
+<a class="sourceLine" id="cb14-17" title="17">df2 <span class="op">=</span> df.withColumn(<span class="st">&quot;value&quot;</span>, from_json(<span class="st">&quot;value&quot;</span>, schema))<span class="op">\</span></a>
+<a class="sourceLine" id="cb14-18" title="18">    .select(col(<span class="st">&#39;key&#39;</span>), col(<span class="st">&#39;value.*&#39;</span>))</a>
+<a class="sourceLine" id="cb14-19" title="19"></a>
+<a class="sourceLine" id="cb14-20" title="20">df2.printSchema()</a>
+<a class="sourceLine" id="cb14-21" title="21">df2.sample(<span class="fl">0.1</span>).show()</a></code></pre></div>
+<p><strong>ACTION: Fill this in for TODO-2 placehold</strong></p>
+<p><strong>ACTION: Run the code again (See Step-4 for run command)</strong></p>
+<p><strong>ACTION: Observe the output. You may see output as follows:</strong></p>
+<pre class="console"><code>+------------+-------------+---------+-------+-------+------------+-----------+----+
+|         key|    timestamp|       ip|   user| action|      domain|   campaign|cost|
++------------+-------------+---------+-------+-------+------------+-----------+----+
+|facebook.com|1642826798006|  1.4.4.3|user-33|blocked|facebook.com|campaign-59|  93|
+|   gmail.com|1642826796603|  1.2.8.1|user-18| viewed|   gmail.com|campaign-17|  66|
+|   gmail.com|1642826796803|  3.1.2.7|user-67| viewed|   gmail.com|campaign-88|  78|
++------------+-------------+---------+-------+-------+------------+-----------+----+</code></pre>
+<h2 id="step-10-todo-3-run-a-spark-sql-query-on-the-data">Step-10: TODO-3 : Run a Spark-SQL Query on the Data</h2>
+<p>we are going to run a SQL query on Kafka data! How cool is that?</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb16-1" title="1"><span class="co"># code for </span><span class="al">TODO</span><span class="co">-3</span></a>
+<a class="sourceLine" id="cb16-2" title="2"><span class="co"># Let&#39;s do a SQL query on Kafka data!</span></a>
+<a class="sourceLine" id="cb16-3" title="3">df2.createOrReplaceTempView(<span class="st">&quot;clickstream_view&quot;</span>)</a>
+<a class="sourceLine" id="cb16-4" title="4"></a>
+<a class="sourceLine" id="cb16-5" title="5"><span class="co"># calculate avg spend per domain</span></a>
+<a class="sourceLine" id="cb16-6" title="6">sql_str <span class="op">=</span> <span class="st">&quot;&quot;&quot;</span></a>
+<a class="sourceLine" id="cb16-7" title="7"><span class="st">SELECT domain, count(*) as impressions, MIN(cost), AVG(cost), MAX(cost)</span></a>
+<a class="sourceLine" id="cb16-8" title="8"><span class="st">FROM clickstream_view</span></a>
+<a class="sourceLine" id="cb16-9" title="9"><span class="st">GROUP BY domain</span></a>
+<a class="sourceLine" id="cb16-10" title="10"><span class="st">&quot;&quot;&quot;</span></a>
+<a class="sourceLine" id="cb16-11" title="11">spark.sql(sql_str).show()</a></code></pre></div>
+<p><strong>ACTION: Fill in the code</strong></p>
+<p><strong>ACTION: run the file</strong></p>
+<p><strong>ACTION: and observe the results</strong></p>
+<pre class="console"><code>+------------+-----------+---------+------------------+---------+
+|      domain|impressions|min(cost)|         avg(cost)|max(cost)|
++------------+-----------+---------+------------------+---------+
+| youtube.com|       2579|        1|50.037999224505626|      100|
+|   gmail.com|       2669|        1|51.293368302735104|      100|
+|facebook.com|       2571|        1|50.560093348891485|      100|
+| twitter.com|       2663|        1| 50.78708223807735|      100|
+|linkedin.com|       2682|        1|51.319910514541384|      100|
++------------+-----------+---------+------------------+---------+</code></pre>
+<h2 id="step-11-todo-4-run-another-spark-sql-query">Step-11: TODO-4: Run another Spark SQL query</h2>
+<p>Let’s continue with Spark SQL and do another query. This time, we are going to calculte the ad performance - views / clicks / blocks - per domain.</p>
+<p>Here is the code:</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb18-1" title="1"><span class="co"># code for </span><span class="al">TODO</span><span class="co">-4</span></a>
+<a class="sourceLine" id="cb18-2" title="2"></a>
+<a class="sourceLine" id="cb18-3" title="3"><span class="co"># count clicks/views/blocks</span></a>
+<a class="sourceLine" id="cb18-4" title="4">sql_str <span class="op">=</span> <span class="st">&quot;&quot;&quot;</span></a>
+<a class="sourceLine" id="cb18-5" title="5"><span class="st">SELECT domain, action, COUNT(action)</span></a>
+<a class="sourceLine" id="cb18-6" title="6"><span class="st">FROM clickstream_view</span></a>
+<a class="sourceLine" id="cb18-7" title="7"><span class="st">GROUP BY ???, ???</span></a>
+<a class="sourceLine" id="cb18-8" title="8"><span class="st">ORDER BY ???</span></a>
+<a class="sourceLine" id="cb18-9" title="9"><span class="st">&quot;&quot;&quot;</span></a>
+<a class="sourceLine" id="cb18-10" title="10">spark.sql(sql_str).show()</a></code></pre></div>
+<p><strong>ACTION: Fill in the code</strong></p>
+<p><strong>ACTION: run the file</strong></p>
+<p><strong>ACTION: and observe the results</strong></p>
+<pre class="console"><code>+------------+-------+-------------+
+|      domain| action|count(action)|
++------------+-------+-------------+
+|facebook.com|blocked|          839|
+|facebook.com|clicked|          878|
+|facebook.com| viewed|          854|
+|   gmail.com|blocked|          919|
+|   gmail.com|clicked|          876|
+|   gmail.com| viewed|          874|
+|linkedin.com|blocked|          869|
+|linkedin.com|clicked|          951|
+|linkedin.com| viewed|          862|
+| twitter.com|blocked|          889|
+| twitter.com|clicked|          892|
+| twitter.com| viewed|          882|
+| youtube.com|blocked|          822|
+| youtube.com|clicked|          914|
+| youtube.com| viewed|          843|
++------------+-------+-------------+</code></pre>
+<h2 id="step-12-bonus-lab-tweak-the-sql-to-produce-a-result-table-like-this">Step-12: Bonus Lab: Tweak the SQL to Produce a Result Table like this</h2>
+<pre class="console"><code>| domain       | views | clicks | blocks |   |
+|--------------|-------|--------|--------|---|
+| facebook.com | 5     | 7      | 12     |   |
+| twitter.com  | 10    | 5      | 9      |   |
+| youtube.com  | 15    | 4      | 10     |   |</code></pre>

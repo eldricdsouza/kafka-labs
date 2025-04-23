@@ -1,0 +1,57 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="practice-lab-fraud-detection">Practice Lab: Fraud Detection</h1>
+<h3 id="overview">Overview</h3>
+<p>Let’s use Kafka Streams to detect fraud IPs in clickstream</p>
+<h3 id="run-time">Run time</h3>
+<p>30 mins</p>
+<h2 id="step-1-undertstanding-clickstream-data">Step-1: Undertstanding Clickstream data</h2>
+<p>Here is a sample clickstream data in JSON format</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb1-1" title="1"><span class="fu">{</span><span class="dt">&quot;timestamp&quot;</span><span class="fu">:</span> <span class="dv">1642840429496</span><span class="fu">,</span> <span class="dt">&quot;ip&quot;</span><span class="fu">:</span> <span class="st">&quot;4.4.8.2&quot;</span><span class="fu">,</span> <span class="dt">&quot;user&quot;</span><span class="fu">:</span> <span class="st">&quot;user-70&quot;</span><span class="fu">,</span> <span class="dt">&quot;action&quot;</span><span class="fu">:</span> <span class="st">&quot;clicked&quot;</span><span class="fu">,</span> <span class="dt">&quot;domain&quot;</span><span class="fu">:</span> <span class="st">&quot;twitter.com&quot;</span><span class="fu">,</span> <span class="dt">&quot;campaign&quot;</span><span class="fu">:</span> <span class="st">&quot;campaign-99&quot;</span><span class="fu">,</span> <span class="dt">&quot;cost&quot;</span><span class="fu">:</span> <span class="dv">26</span><span class="fu">}</span></a></code></pre></div>
+<p>we are going scan records and filter-out fraudulent IP address - these IP addresses are marked as spam / bot originators</p>
+<h2 id="step-2-source-files">Step-2: Source files</h2>
+<ul>
+<li>Producer
+<ul>
+<li>python: <code>python/producer-clickstream.py</code></li>
+<li>Java: <code>src/main/java/x/utils/ClickstreamProducer.java</code></li>
+</ul></li>
+<li>Consumer
+<ul>
+<li>consumer: <code>src/main/java/x/practice_labs/FraudDetectionApp.java</code></li>
+<li>Fraud IP Lookup: <code>src/main/java/x/practice_labs/CacheIPLookup.java</code></li>
+</ul></li>
+</ul>
+<h2 id="step-3-inspect-consumer">Step-3: Inspect Consumer</h2>
+<p>Inspect consumer file : <code>src/main/java/x/practice_labs/FraudDetectionApp.java</code></p>
+<p>Fix TODO items</p>
+<h2 id="step-4-run-the-consumer">Step-4: Run the consumer</h2>
+<p>You can run it via Eclipse</p>
+<p>or run it command line as follows</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="bu">cd</span> ~/kafka-labs</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3">$    <span class="ex">mvn</span> exec:java  -Dexec.mainClass=x.practice_labs.FraudDetectionApp</a></code></pre></div>
+<h2 id="step-5-run-the-producer">Step-5: Run the Producer</h2>
+<p>To run the Java version <code>src/main/java/x/utils/ClickstreamProducer.java</code></p>
+<ul>
+<li>you can run it through Eclipse</li>
+<li>or commnad line as follows</li>
+</ul>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="bu">cd</span> ~/kafka-labs</a>
+<a class="sourceLine" id="cb3-2" title="2"></a>
+<a class="sourceLine" id="cb3-3" title="3">$   <span class="ex">mvn</span> exec:java  -Dexec.mainClass=x.utils.ClickstreamProducer</a></code></pre></div>
+<p>Or you can run a python clickstream producer as well</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$   <span class="bu">cd</span>   ~/kafka-labs/python</a>
+<a class="sourceLine" id="cb4-2" title="2"></a>
+<a class="sourceLine" id="cb4-3" title="3">$   <span class="ex">python</span>   producer-clickstream.py</a></code></pre></div>
+<h2 id="step-6-inspect-the-consumer-output">Step-6: Inspect the Consumer Output</h2>
+<p>Watch the consumer output</p>
+<h2 id="step-7-update-fraud-ip-lookup">Step-7: Update Fraud IP Lookup</h2>
+<p>Add a few more IPs to <code>src/main/java/x/practice_labs/CacheIPLookup.java</code></p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode java"><code class="sourceCode java"><a class="sourceLine" id="cb5-1" title="1"><span class="kw">public</span>  <span class="fu">CacheIPLookup</span>() {</a>
+<a class="sourceLine" id="cb5-2" title="2">    fraudIPs.<span class="fu">add</span>(<span class="st">&quot;1.1&quot;</span>);  <span class="co">// new </span></a>
+<a class="sourceLine" id="cb5-3" title="3">    fraudIPs.<span class="fu">add</span>(<span class="st">&quot;3.3&quot;</span>);</a>
+<a class="sourceLine" id="cb5-4" title="4">    fraudIPs.<span class="fu">add</span>(<span class="st">&quot;4.4&quot;</span>);</a>
+<a class="sourceLine" id="cb5-5" title="5">}</a></code></pre></div>
+<h2 id="step-8-re-run-the-consumer">Step-8: Re run the Consumer</h2>
+<p>See if the new IPs are getting flagged.</p>

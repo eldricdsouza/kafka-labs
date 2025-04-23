@@ -1,0 +1,79 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-avro-schema">Lab: Avro Schema</h1>
+<h2 id="overview">Overview</h2>
+<p>Use Avro schema with Kafka</p>
+<h2 id="duration">Duration</h2>
+<p>30 minutes</p>
+<h2 id="references">References</h2>
+<ul>
+<li><a href="https://dzone.com/articles/kafka-avro-serialization-and-the-schema-registry">https://dzone.com/articles/kafka-avro-serialization-and-the-schema-registry</a></li>
+</ul>
+<h2 id="step-1-create-customer-topic">Step-1: Create <code>customer</code> topic</h2>
+<p>Use command line or Kafka Manager to create a <code>customer</code> topic</p>
+<p>This is using confluent kafka</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1"><span class="co"># be in confluent directory</span></a>
+<a class="sourceLine" id="cb1-2" title="2">$   <span class="bu">cd</span>  ~/apps/confluent</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4">$   <span class="ex">./bin/kafka-topics</span>  --bootstrap-server localhost:9092   \</a>
+<a class="sourceLine" id="cb1-5" title="5">       --create --topic customer --replication-factor 1  --partitions 5</a></code></pre></div>
+<h2 id="step-2-inspect-avro-schema">Step-2: Inspect Avro Schema</h2>
+<p>Avro schema file : <code>src/main/java/x/lab08_avro/customer_v1.avsc</code></p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode json"><code class="sourceCode json"><a class="sourceLine" id="cb2-1" title="1"><span class="fu">{</span><span class="dt">&quot;namespace&quot;</span><span class="fu">:</span> <span class="st">&quot;x.lab08_avro&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-2" title="2"> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;record&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-3" title="3"> <span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;Customer&quot;</span><span class="fu">,</span></a>
+<a class="sourceLine" id="cb2-4" title="4"> <span class="dt">&quot;fields&quot;</span><span class="fu">:</span> <span class="ot">[</span></a>
+<a class="sourceLine" id="cb2-5" title="5">     <span class="fu">{</span><span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;id&quot;</span><span class="fu">,</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;int&quot;</span><span class="fu">}</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb2-6" title="6">     <span class="fu">{</span><span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;name&quot;</span><span class="fu">,</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">}</span><span class="ot">,</span></a>
+<a class="sourceLine" id="cb2-7" title="7">     <span class="fu">{</span><span class="dt">&quot;name&quot;</span><span class="fu">:</span> <span class="st">&quot;email&quot;</span><span class="fu">,</span> <span class="dt">&quot;type&quot;</span><span class="fu">:</span> <span class="st">&quot;string&quot;</span><span class="fu">}</span></a>
+<a class="sourceLine" id="cb2-8" title="8"> <span class="ot">]</span></a>
+<a class="sourceLine" id="cb2-9" title="9"><span class="fu">}</span></a></code></pre></div>
+<h2 id="step-3-install-avro-tools">Step-3: Install AVRO Tools</h2>
+<p>If you don’t have Avro tools, download them as follows:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="fu">mkdir</span>  -p  ~/apps/avro</a>
+<a class="sourceLine" id="cb3-2" title="2">$   <span class="fu">wget</span> -O ~/apps/avro/avro-tools-1.11.1.jar  \</a>
+<a class="sourceLine" id="cb3-3" title="3">          https://dlcdn.apache.org/avro/stable/java/avro-tools-1.11.1.jar</a>
+<a class="sourceLine" id="cb3-4" title="4">$   <span class="fu">wget</span> -O ~/apps/avro/avro-1.11.1.jar   \</a>
+<a class="sourceLine" id="cb3-5" title="5">         https://dlcdn.apache.org/avro/stable/java/avro-1.11.1.jar</a></code></pre></div>
+<p>Verify Avro tools directory:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1">$   <span class="fu">ls</span> -lh  ~/apps/avro</a></code></pre></div>
+<p>You will see downloaded jar files</p>
+<pre class="console"><code>-rw-rw-r-- 1 sujee sujee 596K Jul 26 13:08 avro-1.11.1.jar
+-rw-rw-r-- 1 sujee sujee  53M Jul 26 13:08 avro-tools-1.11.1.jar</code></pre>
+<h2 id="step-4-compile-avro-file">Step-4: Compile Avro file</h2>
+<p>We are going to compile the avro schema into a Java file</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">$   <span class="bu">cd</span>  ~/dev/kafka-labs   <span class="co"># be in project root directory</span></a>
+<a class="sourceLine" id="cb6-2" title="2"></a>
+<a class="sourceLine" id="cb6-3" title="3">$   <span class="ex">java</span> -jar ~/apps/avro/avro-tools-1.11.1.jar  \</a>
+<a class="sourceLine" id="cb6-4" title="4">         compile schema \</a>
+<a class="sourceLine" id="cb6-5" title="5">         src/main/java/x/lab08_avro/customer_v1.avsc \</a>
+<a class="sourceLine" id="cb6-6" title="6">         src/main/java/</a></code></pre></div>
+<p>This will generate <code>Customer.java</code> file.</p>
+<p><strong>Note: To force compile, try deleting the <code>Customer.java</code> file and run the compile again</strong></p>
+<p><strong>==&gt; Inspect the file here : <code>src/main/java/x/lab08_avro/Customer.java</code></strong></p>
+<h2 id="step-5-compile">Step-5: Compile</h2>
+<p>In Eclipse you can force compile the project like this : <code>Project --&gt; Clean --&gt; kafka-api</code></p>
+<p>Make sure the compile is clean with no errors.</p>
+<p>Also do a maven compile as follows</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$   <span class="bu">cd</span>  ~/dev/kafka-labs   <span class="co"># be in project root directory</span></a>
+<a class="sourceLine" id="cb7-2" title="2"></a>
+<a class="sourceLine" id="cb7-3" title="3">$   <span class="ex">mvn</span> clean package  -DskipTests</a></code></pre></div>
+<p>Make sure the compile is clean with no errors.</p>
+<h2 id="step-6-run-the-consumer">Step-6: Run the Consumer</h2>
+<p>Inspect Consumer: <code>src/main/java/x/lab08_avro/AvroConsumer.java</code></p>
+<p>Run the consumer.</p>
+<p><strong>Note: You will need schema registry running to make this work</strong></p>
+<h2 id="step-7-run-the-producer">Step-7: Run the Producer</h2>
+<p>Inspect producer: <code>src/main/java/x/lab08_avro/AvroProducer.java</code></p>
+<p>Run the producer.</p>
+<p><strong>Note: You will need schema registry running to make this work</strong></p>
+<p><strong>==&gt; Observe events going from producer to consumer</strong></p>
+<h2 id="step-8-check-schema-registry">Step-8: Check Schema Registry</h2>
+<p>Query Schema Registry as follows</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$   <span class="ex">curl</span> --silent -X GET http://localhost:8081/schemas/ </a></code></pre></div>
+<p>Better formatting with jq</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$   <span class="ex">curl</span> --silent -X GET http://localhost:8081/schemas/   <span class="kw">|</span> <span class="ex">jq</span></a></code></pre></div>
+<p>Note: if <code>jq</code> is mising, you can install it as follows:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1">$   <span class="fu">sudo</span> apt install -y jq</a></code></pre></div>
+<h2 id="step-9-shutdown-confluent-stack">Step-9: Shutdown Confluent Stack</h2>
+<p>Once you are done, you can shutdown the Confluent stack</p>

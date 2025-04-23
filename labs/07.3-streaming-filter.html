@@ -1,0 +1,33 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-7.3-kafka-streams---filter">Lab 7.3: Kafka Streams - Filter</h1>
+<h2 id="overview">Overview</h2>
+<p>Filter a Kafka stream</p>
+<h2 id="depends-on">Depends On</h2>
+<p><a href="07.1-streaming-intro.html">7.1 streaming intro</a></p>
+<h2 id="run-time">Run time</h2>
+<p>20 mins</p>
+<h2 id="step-1-streaming-consumer-2">Step 1 : Streaming Consumer 2</h2>
+<p>This consumer will read a KafkaStream and extract only <code>action=clicked</code> events.</p>
+<p>File : <code>src/main/java/x/lab07_streaming/StreamingConsumer3_Filter.java</code></p>
+<p>Inspect the file and fix the TODO items.</p>
+<p><strong>Run the <code>lab07_streaming/StreamingConsumer3_Filter</code> in Eclipse</strong></p>
+<h2 id="step-2-run">Step 2 :Run</h2>
+<p><strong>Run the <code>utils.ClickStreamProducer</code> in Eclipse</strong></p>
+<p>Expected output below.</p>
+<p>Notice <code>KStream-filtered-CLICKED</code> will only have ‘action=clicked’ events.</p>
+<pre class="console"><code>[INFO ] 2018-07-22 14:20:38.542 [main] StreamingConsumer3_Filter:main(53) - kstreams starting on clickstream
+
+[KSTREAM-FILTER-0000000001]: facebook.com, {&quot;timestamp&quot;:1451635200005,&quot;session&quot;:&quot;session_251&quot;,&quot;domain&quot;:&quot;facebook.com&quot;,&quot;cost&quot;:91,&quot;user&quot;:&quot;user_16&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_67&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[KSTREAM-FILTER-0000000001]: google.com, {&quot;timestamp&quot;:1451635200025,&quot;session&quot;:&quot;session_29&quot;,&quot;domain&quot;:&quot;google.com&quot;,&quot;cost&quot;:16,&quot;user&quot;:&quot;user_1&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_74&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[KSTREAM-FILTER-0000000001]: twitter.com, {&quot;timestamp&quot;:1451635200040,&quot;session&quot;:&quot;session_259&quot;,&quot;domain&quot;:&quot;twitter.com&quot;,&quot;cost&quot;:8,&quot;user&quot;:&quot;user_1&quot;,&quot;campaign&quot;:&quot;campaign_7&quot;,&quot;ip&quot;:&quot;ip_60&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[KSTREAM-FILTER-0000000001]: google.com, {&quot;timestamp&quot;:1451635200050,&quot;session&quot;:&quot;session_89&quot;,&quot;domain&quot;:&quot;google.com&quot;,&quot;cost&quot;:77,&quot;user&quot;:&quot;user_55&quot;,&quot;campaign&quot;:&quot;campaign_5&quot;,&quot;ip&quot;:&quot;ip_12&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[KSTREAM-FILTER-0000000001]: npr.org, {&quot;timestamp&quot;:1451635200035,&quot;session&quot;:&quot;session_72&quot;,&quot;domain&quot;:&quot;npr.org&quot;,&quot;cost&quot;:85,&quot;user&quot;:&quot;user_40&quot;,&quot;campaign&quot;:&quot;campaign_2&quot;,&quot;ip&quot;:&quot;ip_16&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+[KSTREAM-FILTER-0000000001]: foxnews.com, {&quot;timestamp&quot;:1451635200045,&quot;session&quot;:&quot;session_53&quot;,&quot;domain&quot;:&quot;foxnews.com&quot;,&quot;cost&quot;:46,&quot;user&quot;:&quot;user_26&quot;,&quot;campaign&quot;:&quot;campaign_6&quot;,&quot;ip&quot;:&quot;ip_58&quot;,&quot;action&quot;:&quot;clicked&quot;}
+
+</code></pre>

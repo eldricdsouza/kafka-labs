@@ -1,0 +1,67 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-1.1-run-zookeeper">Lab 1.1 : Run Zookeeper</h1>
+<h3 id="note">Note</h3>
+<p><strong>If you are using the Docker training VM, Zookeeper is already installed. You can skip to Step-8</strong><br />
+<strong>The setup instructions are for your reference</strong></p>
+<h3 id="overview">Overview</h3>
+<p>Install and run Zookeeper</p>
+<h3 id="depends-on">Depends On</h3>
+<p>None</p>
+<h3 id="run-time">Run time</h3>
+<p>10 mins</p>
+<h2 id="step-1-install-zookeeper">Step 1 : Install Zookeeper</h2>
+<p>Try this in terminal</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">    $   <span class="fu">mkdir</span> -p  ~/apps</a>
+<a class="sourceLine" id="cb1-2" title="2">    $   <span class="bu">cd</span>  ~/apps/</a>
+<a class="sourceLine" id="cb1-3" title="3"></a>
+<a class="sourceLine" id="cb1-4" title="4">    $   <span class="fu">wget</span> https://elephantscale-public.s3.amazonaws.com/downloads/zookeeper-3.4.12.tar.gz</a>
+<a class="sourceLine" id="cb1-5" title="5"></a>
+<a class="sourceLine" id="cb1-6" title="6">    $   <span class="fu">tar</span> xvf zookeeper-3.4.12.tar.gz</a>
+<a class="sourceLine" id="cb1-7" title="7"></a>
+<a class="sourceLine" id="cb1-8" title="8">    <span class="co"># rename for easy referral</span></a>
+<a class="sourceLine" id="cb1-9" title="9">    $   <span class="fu">mv</span> zookeeper-3.4.12     zookeeper</a></code></pre></div>
+<h2 id="step-2-configure-zookeeper">Step 2 : Configure Zookeeper</h2>
+<p>Create a sample config file</p>
+<pre><code>tickTime=2000
+dataDir=/tmp/zookeeper-data
+clientPort=2181</code></pre>
+<p>Copy this file into ‘~/apps/zookeeper/conf’ directory as follows.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$  <span class="fu">cat</span> <span class="op">&lt;&lt; EOF</span> <span class="op">&gt;</span> <span class="ex">~/apps/zookeeper/conf/zoo.cfg</span></a>
+<a class="sourceLine" id="cb3-2" title="2">tickTime=2000</a>
+<a class="sourceLine" id="cb3-3" title="3">dataDir=/tmp/zookeeper-data</a>
+<a class="sourceLine" id="cb3-4" title="4">clientPort=2181</a>
+<a class="sourceLine" id="cb3-5" title="5">EOF</a></code></pre></div>
+<h2 id="step-3-create-a-zookeeper-data-directory">Step 3: Create a zookeeper data directory</h2>
+<pre><code>    $    mkdir /tmp/zookeeper-data</code></pre>
+<h2 id="step-4-start-the-zookeeper-server">Step 4: Start the zookeeper server</h2>
+<pre><code>    $  ~/apps/zookeeper/bin/zkServer.sh start</code></pre>
+<h2 id="step-5-verify-zookeeper-is-running">Step 5: Verify Zookeeper is running</h2>
+<p>Using JPS command</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1">    $  <span class="ex">jps</span></a></code></pre></div>
+<p>If we see a process named ‘QuorumPeerMain’ then zookeeper is running</p>
+<pre class="console"><code>67875 QuorumPeerMain
+67732
+67878 Jps</code></pre>
+<h2 id="step-6-optional-zookeeper-cli">Step 6: (Optional) Zookeeper CLI</h2>
+<p>This is a command line client.<br />
+How ever we recommend using the UI client in the next step.</p>
+<pre><code>    $   ~/apps/zookeeper/bin/zkCli.sh  -server  localhost:2181</code></pre>
+<p>This will drop you into ZKCLI. Try these commands in shell.</p>
+<pre><code>    &gt;   help
+    &gt;   stat /
+    &gt;   quit</code></pre>
+<h2 id="step-7-install-zk-web-ui">Step 7 : Install ZK Web UI</h2>
+<p>We can also use <a href="https://github.com/qiuxiafei/zk-web">zk-web</a> to examine zookeeper.</p>
+<pre><code>    $    cd  ~/apps/zk-web
+
+    $    nohup lein run  &amp;
+
+    $    cd</code></pre>
+<h2 id="step-8---using-zkweb-ui">Step 8 - Using ZKWeb UI</h2>
+<p>zk-web can be accessed via port 9001.<br />
+Go to http://your_ip_address:9001 in a browser. Substitute your own machine IP.</p>
+<p><img src="../assets/images/1.1a.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<p>You would see an output like this:</p>
+<p><img src="../assets/images/1.1b.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
+<p><strong>Good, Zookeeper is now up and running</strong></p>

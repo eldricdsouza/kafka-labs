@@ -1,0 +1,131 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-11.3-fraud-detection-with-spark-and-kafka-batch">Lab 11.3: Fraud Detection with Spark and Kafka (Batch)</h1>
+<h3 id="overview">Overview</h3>
+<p>Use Spark to process data in Kafka, we will do a flag clickstream records that are from fraudulent IPs</p>
+<h3 id="run-time">Run time</h3>
+<p>40 mins</p>
+<h2 id="step-1-create-clickstream-topic">Step-1: Create Clickstream Topic</h2>
+<p>If you don’t have the topic, create it as follows</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-topics.sh</span>  --bootstrap-server localhost:9092   \</a>
+<a class="sourceLine" id="cb1-2" title="2">    --create --topic test --replication-factor 1  --partitions 10</a></code></pre></div>
+<h2 id="step-2-generate-clickstream-data">Step-2: Generate Clickstream data</h2>
+<p>Open a terminal and execute the producer</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="bu">cd</span>  ~/kafka-labs/python</a>
+<a class="sourceLine" id="cb2-2" title="2"></a>
+<a class="sourceLine" id="cb2-3" title="3">$   <span class="ex">python</span> producer-clickstream.py</a></code></pre></div>
+<p>This will populate clickstream topic</p>
+<h2 id="step-3-inspect-spark-consumer-code">Step-3: Inspect Spark Consumer Code</h2>
+<p>Inspect file: <code>python/spark-consumer-fraud-detection-batch.py</code></p>
+<p>We will work through TODO items in this file.</p>
+<p><strong>ACTION: Observe the following</strong></p>
+<p>Here we have a simple memory map to store fraudulent IPs for lookup.</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb3-1" title="1"><span class="co"># Fraud IP ranges</span></a>
+<a class="sourceLine" id="cb3-2" title="2">fraud_ips <span class="op">=</span> (</a>
+<a class="sourceLine" id="cb3-3" title="3">        <span class="co"># &#39;3.3&#39;</span></a>
+<a class="sourceLine" id="cb3-4" title="4">        <span class="st">&#39;4.4&#39;</span></a>
+<a class="sourceLine" id="cb3-5" title="5">)</a>
+<a class="sourceLine" id="cb3-6" title="6"></a>
+<a class="sourceLine" id="cb3-7" title="7"><span class="kw">def</span> is_fraud_ip(ip):</a>
+<a class="sourceLine" id="cb3-8" title="8">        a_b <span class="op">=</span> <span class="st">&#39;x.y&#39;</span></a>
+<a class="sourceLine" id="cb3-9" title="9">        tokens  <span class="op">=</span> ip.split(<span class="st">&#39;.&#39;</span>)</a>
+<a class="sourceLine" id="cb3-10" title="10">        <span class="cf">if</span> <span class="bu">len</span>(tokens) <span class="op">==</span> <span class="dv">4</span>:</a>
+<a class="sourceLine" id="cb3-11" title="11">                a_b <span class="op">=</span> <span class="st">&#39;</span><span class="sc">{}</span><span class="st">.</span><span class="sc">{}</span><span class="st">&#39;</span>.<span class="bu">format</span>(tokens[<span class="dv">0</span>],  tokens[<span class="dv">1</span>])</a>
+<a class="sourceLine" id="cb3-12" title="12">        <span class="cf">return</span> a_b <span class="kw">in</span> fraud_ips</a>
+<a class="sourceLine" id="cb3-13" title="13"></a>
+<a class="sourceLine" id="cb3-14" title="14"><span class="co"># define a udf</span></a>
+<a class="sourceLine" id="cb3-15" title="15">is_fraud_ip_udf <span class="op">=</span> udf(is_fraud_ip, BooleanType())</a></code></pre></div>
+<h2 id="step-4-run-spark-consumer">Step-4: Run Spark Consumer</h2>
+<p>Open a terminal and execute these commands:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb4-1" title="1"></a>
+<a class="sourceLine" id="cb4-2" title="2">$   <span class="bu">cd</span>  ~/kafka-labs/python</a>
+<a class="sourceLine" id="cb4-3" title="3"></a>
+<a class="sourceLine" id="cb4-4" title="4">$  <span class="ex">~/apps/spark/bin/spark-submit</span>  --master local[2] \</a>
+<a class="sourceLine" id="cb4-5" title="5">    --driver-class-path .  \</a>
+<a class="sourceLine" id="cb4-6" title="6">    --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.0.1 \</a>
+<a class="sourceLine" id="cb4-7" title="7">    spark-consumer-fraud-detection-batch.py</a></code></pre></div>
+<p>This will initialize Spark session and connect to Kafka. You will output like following</p>
+<pre class="console"><code>root
+ |-- key: string (nullable = true)
+ |-- value: string (nullable = true)
+ |-- topic: string (nullable = true)
+ |-- partition: integer (nullable = true)
+ |-- offset: long (nullable = true)
+ |-- timestamp: timestamp (nullable = true)</code></pre>
+<p><strong>ACTION: Observe how Spark reads from Kafka and the data types</strong></p>
+<h2 id="step-5-todo-1---go-through-all-kafka-data">Step-5: TODO-1 - Go through all Kafka Data</h2>
+<p>Here is code process entire Kafka data</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># code for </span><span class="al">TODO</span><span class="co">-1</span></a>
+<a class="sourceLine" id="cb6-2" title="2"><span class="bu">print</span> (<span class="st">&quot;total count: &quot;</span>, df.count())</a>
+<a class="sourceLine" id="cb6-3" title="3">df.show()</a></code></pre></div>
+<p><strong>ACTION: Use the code above</strong></p>
+<p><strong>ACTION: run the code again</strong></p>
+<p><strong>ACTION: Observe output. It may seem like below:</strong></p>
+<pre class="console"><code>+------------+--------------------+-----------+---------+------+--------------------+
+|         key|               value|      topic|partition|offset|           timestamp|
++------------+--------------------+-----------+---------+------+--------------------+
+|facebook.com|{&quot;timestamp&quot;: 164...|clickstream|        9|  1988|2022-01-22 04:37:...|
+|facebook.com|{&quot;timestamp&quot;: 164...|clickstream|        9|  1989|2022-01-22 04:37:...|
+|facebook.com|{&quot;timestamp&quot;: 164...|clickstream|        9|  1990|2022-01-22 04:37:...|
++------------+--------------------+-----------+---------+------+--------------------+</code></pre>
+<h2 id="step-6-todo-2---extract-kafka-data-into-dataframes">Step-6: TODO-2 - Extract Kafka Data into Dataframes</h2>
+<p>Now let’s extract JSON data into Spark dataframe, so we can process it easily.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb8-1" title="1"><span class="co"># code for </span><span class="al">TODO</span><span class="co">-2</span></a>
+<a class="sourceLine" id="cb8-2" title="2"></a>
+<a class="sourceLine" id="cb8-3" title="3"><span class="co"># first we need a schema</span></a>
+<a class="sourceLine" id="cb8-4" title="4">schema <span class="op">=</span> StructType(</a>
+<a class="sourceLine" id="cb8-5" title="5">    [</a>
+<a class="sourceLine" id="cb8-6" title="6">        StructField(<span class="st">&#39;timestamp&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb8-7" title="7">        StructField(<span class="st">&#39;ip&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb8-8" title="8">        StructField(<span class="st">&#39;user&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb8-9" title="9">        StructField(<span class="st">&#39;action&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb8-10" title="10">        StructField(<span class="st">&#39;domain&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb8-11" title="11">        StructField(<span class="st">&#39;campaign&#39;</span>, StringType(), <span class="va">True</span>),</a>
+<a class="sourceLine" id="cb8-12" title="12">        StructField(<span class="st">&#39;cost&#39;</span>, IntegerType(), <span class="va">True</span>)</a>
+<a class="sourceLine" id="cb8-13" title="13">    ]</a>
+<a class="sourceLine" id="cb8-14" title="14">)</a>
+<a class="sourceLine" id="cb8-15" title="15"></a>
+<a class="sourceLine" id="cb8-16" title="16"><span class="co"># extract value from JSON string and populate into another df</span></a>
+<a class="sourceLine" id="cb8-17" title="17">df2 <span class="op">=</span> df.withColumn(<span class="st">&quot;value&quot;</span>, from_json(<span class="st">&quot;value&quot;</span>, schema))<span class="op">\</span></a>
+<a class="sourceLine" id="cb8-18" title="18">    .select(col(<span class="st">&#39;key&#39;</span>), col(<span class="st">&#39;value.*&#39;</span>))</a>
+<a class="sourceLine" id="cb8-19" title="19"></a>
+<a class="sourceLine" id="cb8-20" title="20">df2.printSchema()</a>
+<a class="sourceLine" id="cb8-21" title="21">df2.sample(<span class="fl">0.1</span>).show()</a></code></pre></div>
+<p><strong>ACTION: Use the code above</strong></p>
+<p><strong>ACTION: Run the code again</strong></p>
+<p><strong>ACTION: Observe output. It may seem like below:</strong></p>
+<pre class="console"><code>+------------+-------------+---------+-------+-------+------------+-----------+----+
+|         key|    timestamp|       ip|   user| action|      domain|   campaign|cost|
++------------+-------------+---------+-------+-------+------------+-----------+----+
+|facebook.com|1642826798006|  1.4.4.3|user-33|blocked|facebook.com|campaign-59|  93|
+|   gmail.com|1642826796603|  1.2.8.1|user-18| viewed|   gmail.com|campaign-17|  66|
+|   gmail.com|1642826796803|  3.1.2.7|user-67| viewed|   gmail.com|campaign-88|  78|
++------------+-------------+---------+-------+-------+------------+-----------+----+</code></pre>
+<h2 id="step-7-todo-3-detect-fraud-ips">Step-7: TODO-3 : Detect Fraud IPs</h2>
+<p>Here is the code for TODO-3</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb10-1" title="1">fraud_df <span class="op">=</span> df2.<span class="bu">filter</span>(is_fraud_ip_udf(<span class="st">&#39;ip&#39;</span>))</a>
+<a class="sourceLine" id="cb10-2" title="2">fraud_df.show()</a>
+<a class="sourceLine" id="cb10-3" title="3"></a>
+<a class="sourceLine" id="cb10-4" title="4"><span class="bu">print</span> (<span class="st">&quot;Total record count: &quot;</span>, df2.count())</a>
+<a class="sourceLine" id="cb10-5" title="5"><span class="bu">print</span> (<span class="st">&quot;Fraud record count: &quot;</span>, fraud_df.count())</a></code></pre></div>
+<p><strong>ACTION: Use the code above</strong></p>
+<p><strong>ACTION: Run the code again</strong></p>
+<p><strong>ACTION: Observe output. It may seem like below:</strong></p>
+<pre class="console"><code>+-----------+-------------+--------+-------+-------+-----------+-----------+----+
+|        key|    timestamp|      ip|   user| action|     domain|   campaign|cost|
++-----------+-------------+--------+-------+-------+-----------+-----------+----+
+|twitter.com|1642712906740| 4.4.0.9| user-6|clicked|twitter.com|campaign-73|  54|
+|twitter.com|1642714594204| 4.4.3.4|user-20|clicked|twitter.com|campaign-61|  39|
++-----------+-------------+--------+-------+-------+-----------+-----------+----+
+
+
+Total record count:  14164
+Fraud record count:  1677</code></pre>
+<h2 id="step-8-add-to-fraud-ips">Step-8: Add to Fraud IPs</h2>
+<p>Once the code is working, go ahead and change the <code>fraud_ips</code> map. For example, add IP range <code>1.1</code> to IP map, as follows:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode python"><code class="sourceCode python"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># Fraud IP ranges</span></a>
+<a class="sourceLine" id="cb12-2" title="2">fraud_ips <span class="op">=</span> (</a>
+<a class="sourceLine" id="cb12-3" title="3">        <span class="st">&#39;3.3&#39;</span>,</a>
+<a class="sourceLine" id="cb12-4" title="4">        <span class="st">&#39;4.4&#39;</span></a>
+<a class="sourceLine" id="cb12-5" title="5">)</a></code></pre></div>
+<p><strong>ACTION: Rerun the code and see if we can catch the new fraud IPs</strong></p>

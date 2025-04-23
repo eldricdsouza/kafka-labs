@@ -1,0 +1,79 @@
+<p><link rel='stylesheet' href='../assets/css/main.css'/></p>
+<p><a href="../README.html">&lt;&lt; back to main index</a></p>
+<h1 id="lab-install-confluent">Lab: Install Confluent</h1>
+<h2 id="overview">Overview</h2>
+<p>Install and run Confluent platform</p>
+<h2 id="depends-on">Depends On</h2>
+<p>None</p>
+<h2 id="run-time">Run time</h2>
+<p>15 mins</p>
+<h2 id="step-1-shutdown-any-running-kafka-instance">Step 1: Shutdown any running Kafka instance</h2>
+<p>Run the following in a terminal</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb1-1" title="1">$   <span class="ex">~/apps/kafka/bin/kafka-server-stop.sh</span></a>
+<a class="sourceLine" id="cb1-2" title="2"></a>
+<a class="sourceLine" id="cb1-3" title="3">$   <span class="ex">~/apps/kafka/bin/zookeeper-server-stop.sh</span> </a></code></pre></div>
+<p>Verify the services have stopped by doing a <code>jps</code> command</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb2-1" title="1">$   <span class="ex">jps</span></a></code></pre></div>
+<p>If the above commands fail, send kill signal to kafka and zookeeper pids. Here is an example</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb3-1" title="1">$   <span class="ex">jps</span></a></code></pre></div>
+<pre class="console"><code>1111  QuroumPeerMain
+2222  Kafka
+3333  Worker</code></pre>
+<p>Then send kills signal as follwos</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb5-1" title="1"><span class="co"># kill kafka first</span></a>
+<a class="sourceLine" id="cb5-2" title="2"><span class="co"># </span><span class="al">TODO</span><span class="co">: Adjust PID to match yours</span></a>
+<a class="sourceLine" id="cb5-3" title="3">$   <span class="bu">kill</span> 2222</a></code></pre></div>
+<p>Use <code>jps</code> to make sure kafka process is terminated.</p>
+<p>Then kill zookeeper</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb6-1" title="1"><span class="co"># </span><span class="al">TODO</span><span class="co">: Adjust PID to match yours</span></a>
+<a class="sourceLine" id="cb6-2" title="2">$   <span class="bu">kill</span> 1111</a></code></pre></div>
+<p>And also kill Worker</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb7-1" title="1">$   <span class="bu">kill</span> 3333</a></code></pre></div>
+<p>Make sure the output doesn’t have <code>QuroumPeerMain</code> or <code>Kafka</code> or <code>Worker</code></p>
+<p><strong>Also cleanup storage directories</strong></p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb8-1" title="1">$   <span class="fu">rm</span> -rf  /tmp/zookeeper*</a>
+<a class="sourceLine" id="cb8-2" title="2">$   <span class="fu">rm</span> -rf  /tmp/kafka-logs*</a></code></pre></div>
+<h2 id="step-2-download-confluent">Step 2 : Download confluent</h2>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb9-1" title="1">$   <span class="bu">cd</span>   ~/apps</a>
+<a class="sourceLine" id="cb9-2" title="2"></a>
+<a class="sourceLine" id="cb9-3" title="3">$   <span class="fu">wget</span> http://packages.confluent.io/archive/7.2/confluent-7.2.0.tar.gz</a>
+<a class="sourceLine" id="cb9-4" title="4"></a>
+<a class="sourceLine" id="cb9-5" title="5">$   <span class="fu">tar</span> xf  confluent-7.2.0.tar.gz</a>
+<a class="sourceLine" id="cb9-6" title="6"></a>
+<a class="sourceLine" id="cb9-7" title="7">$   <span class="fu">mv</span>  confluent-7.2.0    confluent</a></code></pre></div>
+<p>Now Confluent is installed under <strong><code>~/apps/confluent</code></strong></p>
+<h2 id="step-3-run-confluent-stack">Step 3 : Run Confluent Stack</h2>
+<p>Start the following components. You need to open new terminals, run the commands and leave them running:</p>
+<p><strong>==&gt; In terminal-1 start zookeeper</strong></p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb10-1" title="1"><span class="co"># be in confluent directory</span></a>
+<a class="sourceLine" id="cb10-2" title="2">$   <span class="bu">cd</span>  ~/apps/confluent</a>
+<a class="sourceLine" id="cb10-3" title="3"></a>
+<a class="sourceLine" id="cb10-4" title="4">$   <span class="ex">./bin/zookeeper-server-start</span>  ./etc/kafka/zookeeper.properties</a></code></pre></div>
+<p><strong>==&gt; In terminal-2, start Kafka</strong></p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb11-1" title="1"><span class="co"># be in confluent directory</span></a>
+<a class="sourceLine" id="cb11-2" title="2">$   <span class="bu">cd</span>  ~/apps/confluent</a>
+<a class="sourceLine" id="cb11-3" title="3"></a>
+<a class="sourceLine" id="cb11-4" title="4"><span class="va">JMX_PORT=</span>9999   <span class="ex">./bin/kafka-server-start</span>  ./etc/kafka/server.properties</a></code></pre></div>
+<p><strong>==&gt; In terminal-3 start Schema Registry:</strong></p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb12-1" title="1"><span class="co"># be in confluent directory</span></a>
+<a class="sourceLine" id="cb12-2" title="2">$   <span class="bu">cd</span>  ~/apps/confluent</a>
+<a class="sourceLine" id="cb12-3" title="3"></a>
+<a class="sourceLine" id="cb12-4" title="4">$   <span class="ex">./bin/schema-registry-start</span>  ./etc/schema-registry/schema-registry.properties</a></code></pre></div>
+<p><strong>Troubleshooting</strong></p>
+<p>Schema registry uses port 8081. Sometimes other programs like ‘Spark worker’ may be using the same port. If that’s the case use the following to stop Worker</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb13-1" title="1">$   <span class="ex">jps</span></a></code></pre></div>
+<pre class="console"><code>5555   Worker</code></pre>
+<p>Now send a kill signal to Spark worker</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb15-1" title="1"><span class="co"># </span><span class="al">TODO</span><span class="co">: Adjust the PID to match yours!</span></a>
+<a class="sourceLine" id="cb15-2" title="2">$   <span class="bu">kill</span> 5555</a></code></pre></div>
+<p>And then restart Schema registry again.</p>
+<h2 id="step-4-verify-confluent-stack-is-running">Step-4: Verify Confluent Stack is Running</h2>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash"><code class="sourceCode bash"><a class="sourceLine" id="cb16-1" title="1">$   <span class="ex">jps</span></a></code></pre></div>
+<p>You might see output like this:</p>
+<pre class="console"><code>2812156 QuorumPeerMain
+2815132 SchemaRegistryMain
+2813284 Kafka
+2817717 Jps</code></pre>
+<h2 id="step-5-register-cluster-in-kafka-manager">Step-5: Register Cluster in Kafka Manager</h2>
+<p>You can optionally register the cluster in Kafka Manager</p>
+<p><img src="../assets/images/1.2b.png" style="border: 5px solid grey ; max-width:100%;"  /></p>
